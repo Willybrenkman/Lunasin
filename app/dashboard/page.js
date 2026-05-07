@@ -44,9 +44,16 @@ export default function Dashboard() {
           
           // Calculate achievements dynamically
           const totalAwal = data.reduce((s, d) => s + Number(d.total || 0), 0);
-          const totalSisa = data.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
+          const totalSisa = data.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
           const progress = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
-          const paidOff = data.filter(d => Number(d.sisa) === 0 && Number(d.total) > 0).length;
+          
+          // Strict check for paid off debts: either status is paid_off, or sisa is strictly <= 0 and total > 0
+          const paidOff = data.filter(d => {
+            const isPaidStatus = d.status === 'paid_off';
+            const isSisaZero = d.sisa !== null && d.sisa !== undefined && Number(d.sisa) <= 0 && Number(d.total) > 0;
+            return isPaidStatus || isSisaZero;
+          }).length;
+
           setAchievements(getAchievements({ paidOff, progress }));
         } else {
           // Default empty state
