@@ -14,6 +14,7 @@ export default function AddDebt() {
     min_payment: "",
     tanggal_mulai: "",
     jatuh_tempo: "",
+    tanggal_tagihan: "",
     notes: ""
   });
   const [loading, setLoading] = useState(false);
@@ -138,6 +139,16 @@ export default function AddDebt() {
                 icon={<Calendar size={18} />}
                 value={form.tanggal_mulai}
                 onChange={e => setForm({...form, tanggal_mulai: e.target.value})}
+              />
+              <InputField 
+                label="Tanggal Tagihan / Jatuh Tempo Bulanan" 
+                placeholder="cth: 25 (pilih tgl 1-31)" 
+                type="number"
+                min="1"
+                max="31"
+                icon={<CalendarCheck size={18} />}
+                value={form.tanggal_tagihan}
+                onChange={e => setForm({...form, tanggal_tagihan: e.target.value})}
               />
               <InputField 
                 label="Target Lunas / Berakhir" 

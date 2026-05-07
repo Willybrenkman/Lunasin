@@ -150,8 +150,8 @@ export default function DebtsPage() {
             <thead className="bg-black/20">
               <tr className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
                 <th className="px-8 py-5">Nama Hutang</th>
-                <th className="px-8 py-5">Total</th>
-                <th className="px-8 py-5">Sisa</th>
+                <th className="px-8 py-5">Sisa Hutang</th>
+                <th className="px-8 py-5">Jadwal Tagihan</th>
                 <th className="px-8 py-5">Bunga</th>
                 <th className="px-8 py-5">Minimum / bln</th>
                 <th className="px-8 py-5">Durasi (Mulai - Selesai)</th>
@@ -175,11 +175,11 @@ export default function DebtsPage() {
                   <td className="px-8 py-6">
                     <p className="font-bold text-white text-sm group-hover:text-[#22C55E] transition-colors">{d.name}</p>
                   </td>
-                  <td className="px-8 py-6 text-[13px] text-gray-400">
-                    {formatMoney(d.total)}
-                  </td>
                   <td className="px-8 py-6 font-bold text-white text-sm">
                     {formatMoney(d.sisa ?? d.total)}
+                  </td>
+                  <td className="px-8 py-6 text-sm text-gray-400 font-bold whitespace-nowrap">
+                    {d.tanggal_tagihan ? `Tgl ${d.tanggal_tagihan}` : "-"}
                   </td>
                   <td className="px-8 py-6 text-[13px] text-gray-400">{d.interest}%</td>
                   <td className="px-8 py-6 text-[13px] text-gray-400">
@@ -292,6 +292,18 @@ export default function DebtsPage() {
                     required 
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Tgl Tagihan / Bulanan (1-31)</label>
+                <input 
+                  type="number" 
+                  min="1" max="31"
+                  placeholder="Contoh: 25"
+                  value={editModal.data.tanggal_tagihan || ""}
+                  onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, tanggal_tagihan: e.target.value}}))}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                />
               </div>
               
               <div>

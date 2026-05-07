@@ -28,20 +28,27 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
+    const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes } = body;
     
     // Ambil user yang sedang login
     const { data: { user } } = await supabase.auth.getUser();
     
-    const insertData = {
-      ...body,
-      user_id: user?.id || null,
-      sisa: body.sisa || body.total, // Sisa = total awal jika tidak diisi
-    };
-
     const { data, error } = await supabase
       .from("debts")
-      .insert([insertData])
-      .select();
+      .insert([
+        {
+          user_id: user?.id || null,
+          name,
+          total: Number(total),
+          sisa: Number(total), // Sisa awal = total
+          interest: Number(interest),
+          min_payment: Number(min_payment),
+          tanggal_mulai: tanggal_mulai || null,
+          jatuh_tempo: jatuh_tempo || null,
+          tanggal_tagihan: tanggal_tagihan ? Number(tanggal_tagihan) : null,
+          notes
+        }
+      ]).select();
 
     if (error) throw error;
     return NextResponse.json({ data });
