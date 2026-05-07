@@ -66,7 +66,7 @@ export default function DebtsPage() {
                 <th className="px-8 py-5">Sisa</th>
                 <th className="px-8 py-5">Bunga</th>
                 <th className="px-8 py-5">Minimum / bln</th>
-                <th className="px-8 py-5">Jatuh Tempo</th>
+                <th className="px-8 py-5">Durasi (Mulai - Selesai)</th>
                 <th className="px-8 py-5 text-center">Status</th>
                 <th className="px-8 py-5"></th>
               </tr>
@@ -97,7 +97,12 @@ export default function DebtsPage() {
                   <td className="px-8 py-6 text-[13px] text-gray-400">
                     {formatMoney(d.min_payment)}
                   </td>
-                  <td className="px-8 py-6 text-[13px] text-gray-400">{d.jatuh_tempo || d.jatuhTempo || "-"}</td>
+                  <td className="px-8 py-6 text-[13px] text-gray-400">
+                    <div className="flex flex-col">
+                      <span>Mulai: {d.tanggal_mulai ? new Date(d.tanggal_mulai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}</span>
+                      <span className="text-gold">Selesai: {d.jatuh_tempo ? new Date(d.jatuh_tempo).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}</span>
+                    </div>
+                  </td>
                   <td className="px-8 py-6 text-center">
                     <span className="inline-block px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-[9px] font-black rounded-md uppercase tracking-widest border border-[#22C55E]/20">
                       Aktif

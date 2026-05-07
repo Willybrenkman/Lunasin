@@ -227,7 +227,7 @@ export default function Dashboard() {
                 <th className="px-8 py-5">Sisa</th>
                 <th className="px-8 py-5">Bunga</th>
                 <th className="px-8 py-5">Minimum / bln</th>
-                <th className="px-8 py-5">Jatuh Tempo</th>
+                <th className="px-8 py-5">Durasi (Mulai - Selesai)</th>
                 <th className="px-8 py-5 text-center">Status</th>
               </tr>
             </thead>
@@ -240,7 +240,8 @@ export default function Dashboard() {
                   sisa={formatMoney(d.sisa || d.total)}
                   interest={`${d.interest}%`}
                   min={formatMoney(d.min_payment)}
-                  jatuhTempo={d.jatuh_tempo || d.jatuhTempo || "-"}
+                  tanggalMulai={d.tanggal_mulai}
+                  jatuhTempo={d.jatuh_tempo}
                 />
               ))}
             </tbody>
@@ -251,7 +252,7 @@ export default function Dashboard() {
   );
 }
 
-function DebtRow({ name, total, sisa, interest, min, jatuhTempo }) {
+function DebtRow({ name, total, sisa, interest, min, tanggalMulai, jatuhTempo }) {
   return (
     <tr className="hover:bg-white/[0.02] transition-colors cursor-pointer group">
       <td className="px-8 py-6 font-bold text-white text-sm group-hover:text-[#22C55E]">{name}</td>
@@ -259,7 +260,12 @@ function DebtRow({ name, total, sisa, interest, min, jatuhTempo }) {
       <td className="px-8 py-6 font-bold text-white text-sm">{sisa}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">{interest}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">{min}</td>
-      <td className="px-8 py-6 text-[13px] text-gray-400">{jatuhTempo}</td>
+      <td className="px-8 py-6 text-[13px] text-gray-400">
+        <div className="flex flex-col">
+          <span>Mulai: {tanggalMulai ? new Date(tanggalMulai).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}</span>
+          <span className="text-gold">Selesai: {jatuhTempo ? new Date(jatuhTempo).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "-"}</span>
+        </div>
+      </td>
       <td className="px-8 py-6 text-center">
         <span className="inline-block px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-[9px] font-black rounded-md uppercase tracking-widest border border-[#22C55E]/20">Aktif</span>
       </td>
