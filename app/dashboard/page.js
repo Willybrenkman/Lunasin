@@ -41,7 +41,16 @@ export default function Dashboard() {
           // Calculate premium features
           setInsight(generateInsight({ months: plan.length, totalInterest: plan.reduce((s, p) => s + p.total, 0) }));
           setRecommendationMsg(recommend(data));
-          setAchievements(getAchievements({ paidOff: 1, progress: 35 }));
+          
+          // Calculate achievements dynamically
+          const totalAwal = data.reduce((s, d) => s + Number(d.total || 0), 0);
+          const totalSisa = data.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
+          const progress = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
+          const paidOff = data.filter(d => Number(d.sisa) === 0 && Number(d.total) > 0).length;
+          setAchievements(getAchievements({ paidOff, progress }));
+        } else {
+          // Default empty state
+          setAchievements(getAchievements({ paidOff: 0, progress: 0 }));
         }
       } catch (e) {
         console.error(e);
