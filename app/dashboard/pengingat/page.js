@@ -1,19 +1,80 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, Mail, MessageCircle, Calendar, AlertCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Bell, Mail, MessageCircle, Calendar, AlertCircle, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function PengingatPage() {
   const [enabled, setEnabled] = useState(true);
   const [emailNotif, setEmailNotif] = useState(true);
   const [waNotif, setWaNotif] = useState(true);
   const [reminderDays, setReminderDays] = useState("3 hari sebelum jatuh tempo");
+  const [loading, setLoading] = useState(true);
+  const [debts, setDebts] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
 
-  const upcomingDebts = [
-    { name: "Kartu Kredit BCA", date: "10 Juli 2024", status: "3 hari lagi", urgent: true },
-    { name: "Kredit Motor Honda", date: "15 Agustus 2024", status: "39 hari lagi", urgent: false },
-    { name: "Pinjaman Online A", date: "5 Juli 2024", status: "Sudah jatuh tempo", urgent: true },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setLoading(false); return; }
+        setUserEmail(user.email || "");
+
+        // Fetch debts with jatuh_tempo
+        const { data, error } = await supabase
+          .from("debts")
+          .select("name, jatuh_tempo, status")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .not("jatuh_tempo", "is", null)
+          .order("jatuh_tempo", { ascending: true });
+
+        if (!error && data) setDebts(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // Compute upcoming debts from real data
+  const today = new Date();
+  const upcomingDebts = debts.map(d => {
+    const dueDate = new Date(d.jatuh_tempo);
+    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    let status = "";
+    let urgent = false;
+
+    if (diffDays < 0) {
+      status = "Sudah jatuh tempo";
+      urgent = true;
+    } else if (diffDays === 0) {
+      status = "Hari ini!";
+      urgent = true;
+    } else if (diffDays <= 7) {
+      status = `${diffDays} hari lagi`;
+      urgent = true;
+    } else {
+      status = `${diffDays} hari lagi`;
+      urgent = false;
+    }
+
+    return {
+      name: d.name,
+      date: dueDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
+      status,
+      urgent,
+    };
+  });
+
+  if (loading) return (
+    <div className="h-[60vh] flex items-center justify-center">
+      <Loader2 className="animate-spin text-gold" size={40} />
+    </div>
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
@@ -55,7 +116,7 @@ export default function PengingatPage() {
             <CheckboxRow
               icon={<Mail size={18} />}
               label="Email"
-              sub="andi@example.com"
+              sub={userEmail || "Belum tersedia"}
               checked={emailNotif}
               onChange={setEmailNotif}
             />
@@ -63,7 +124,7 @@ export default function PengingatPage() {
             <CheckboxRow
               icon={<MessageCircle size={18} />}
               label="WhatsApp"
-              sub="+62 812 3456 7890"
+              sub="Segera hadir"
               checked={waNotif}
               onChange={setWaNotif}
             />
@@ -87,7 +148,15 @@ export default function PengingatPage() {
           </div>
 
           <div className="space-y-3">
-            {upcomingDebts.map((debt, idx) => (
+            {upcomingDebts.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 font-bold text-sm mb-2">Belum ada jadwal jatuh tempo</p>
+                <p className="text-gray-600 text-xs mb-4">Tambahkan tanggal jatuh tempo di data hutangmu agar pengingat aktif.</p>
+                <Link href="/dashboard/debts" className="text-gold text-xs font-black uppercase tracking-widest hover:underline">
+                  Kelola Hutang →
+                </Link>
+              </div>
+            ) : upcomingDebts.map((debt, idx) => (
               <div key={idx} className="flex items-center justify-between p-4 bg-black/20 border border-white/5 rounded-2xl hover:bg-white/[0.02] transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">

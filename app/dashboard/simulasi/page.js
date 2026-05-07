@@ -13,6 +13,7 @@ export default function SimulasiPage() {
   const [chartData, setChartData] = useState([]);
   const [strategy, setStrategy] = useState("Smart Priority");
   const [debts, setDebts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { formatMoney } = usePrivacy();
 
   useEffect(() => {
@@ -23,6 +24,8 @@ export default function SimulasiPage() {
         setDebts(result.data || []);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     }
     fetchDebts();
@@ -35,13 +38,47 @@ export default function SimulasiPage() {
     }
   }, [strategy, debts]);
 
-  const whatIfData = [
-    { extra: formatMoney("0"), months: "24 bulan", totalInterest: formatMoney("4050000"), savings: formatMoney("0"), status: "" },
-    { extra: formatMoney("250000"), months: "18 bulan", totalInterest: formatMoney("2650000"), savings: formatMoney("1400000"), status: "" },
-    { extra: formatMoney("500000"), months: "14 bulan", totalInterest: formatMoney("1750000"), savings: formatMoney("2300000"), status: "Optimal" },
-    { extra: formatMoney("1020000"), months: "10 bulan", totalInterest: formatMoney("950000"), savings: formatMoney("3100000"), status: "" },
-    { extra: formatMoney("1500000"), months: "7 bulan", totalInterest: formatMoney("550000"), savings: formatMoney("3500000"), status: "" },
-  ];
+  // Hitung summary dari data real
+  const totalSisa = debts.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
+  const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
+  const estimasiBulan = chartData.length || 0;
+
+  // Hitung what-if analysis dari data real
+  const extraAmounts = [0, 250000, 500000, 1000000, 1500000];
+  const baselineMonths = totalMinPayment > 0 ? Math.ceil(totalSisa / totalMinPayment) : 0;
+
+  const whatIfData = debts.length > 0 ? extraAmounts.map((extra, idx) => {
+    const monthlyTotal = totalMinPayment + extra;
+    const months = monthlyTotal > 0 ? Math.ceil(totalSisa / monthlyTotal) : 0;
+    const avgInterest = debts.reduce((s, d) => s + Number(d.interest || 0), 0) / debts.length;
+    const estInterest = Math.round(totalSisa * (avgInterest / 100 / 12) * months);
+    const baseInterest = Math.round(totalSisa * (avgInterest / 100 / 12) * baselineMonths);
+    const savings = baseInterest - estInterest;
+
+    return {
+      extra: formatMoney(extra),
+      months: `${months} bulan`,
+      totalInterest: formatMoney(estInterest),
+      savings: formatMoney(Math.max(savings, 0)),
+      status: idx === 2 ? "Optimal" : "",
+    };
+  }) : [];
+
+  if (loading) return (
+    <div className="h-[60vh] flex items-center justify-center">
+      <div className="animate-spin w-10 h-10 border-4 border-gold border-t-transparent rounded-full" />
+    </div>
+  );
+
+  if (debts.length === 0) return (
+    <div className="h-[60vh] flex flex-col items-center justify-center text-center">
+      <p className="text-gray-500 font-bold text-lg mb-2">Belum ada data hutang</p>
+      <p className="text-gray-600 text-sm mb-6">Tambahkan hutang terlebih dahulu untuk menjalankan simulasi.</p>
+      <Link href="/dashboard/add" className="bg-[#D4AF37] text-black font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest hover:brightness-110 transition-all">
+        Tambah Hutang
+      </Link>
+    </div>
+  );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-1000 max-w-[1400px] mx-auto">
@@ -102,17 +139,16 @@ export default function SimulasiPage() {
             <div className="grid md:grid-cols-3 gap-6 mb-8">
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Estimasi Bebas Hutang</p>
-                 <p className="font-black text-white text-lg">14 bulan</p>
-                 <p className="text-[11px] text-gray-400 mt-0.5">(Februari 2026)</p>
+                 <p className="font-black text-white text-lg">{estimasiBulan > 0 ? `${estimasiBulan} bulan` : "-"}</p>
                </div>
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Bunga Dibayar</p>
-                 <p className="font-black text-white text-lg">{formatMoney("1750000")}</p>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Sisa Hutang</p>
+                 <p className="font-black text-white text-lg">{formatMoney(totalSisa)}</p>
                </div>
                <div className="bg-[#22C55E]/10 p-5 rounded-2xl border border-[#22C55E]/20">
-                 <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-widest mb-1">Total Bunga Hemat</p>
-                 <p className="font-black text-[#22C55E] text-xl">{formatMoney("2300000")}</p>
-                 <p className="text-[9px] text-[#22C55E] mt-1 opacity-80">Dibandingkan pembayaran minimum</p>
+                 <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-widest mb-1">Total Cicilan / Bulan</p>
+                 <p className="font-black text-[#22C55E] text-xl">{formatMoney(totalMinPayment)}</p>
+                 <p className="text-[9px] text-[#22C55E] mt-1 opacity-80">Cicilan minimum dari semua hutang</p>
                </div>
             </div>
             
@@ -126,7 +162,7 @@ export default function SimulasiPage() {
         <div className="lg:col-span-12">
           <div className="luxury-card rounded-[2rem] overflow-hidden">
             <div className="p-8 border-b border-white/5">
-              <h3 className="font-black text-xl text-white tracking-tight mb-1 uppercase text-sm tracking-widest">Coba Berbagai Skenario Pembayaran</h3>
+              <h3 className="font-black text-sm text-white tracking-tight mb-1 uppercase tracking-widest">Coba Berbagai Skenario Pembayaran</h3>
               <p className="text-xs text-gray-500 font-medium">Lihat bagaimana perubahan extra payment memengaruhi waktu lunas dan bunga.</p>
             </div>
             <div className="overflow-x-auto">

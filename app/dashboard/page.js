@@ -166,12 +166,12 @@ export default function Dashboard() {
                
                <div className="space-y-4">
                   <div className="flex justify-between items-center bg-black/20 p-4 rounded-xl border border-white/5">
-                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Hutang Turun</span>
-                    <span className="text-sm font-black text-[#22C55E]">{formatMoney("1200000")}</span>
+                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Sudah Terbayar</span>
+                    <span className="text-sm font-black text-[#22C55E]">{formatMoney(totalHutang - sisaHutang)}</span>
                   </div>
                   <div className="flex justify-between items-center bg-black/20 p-4 rounded-xl border border-white/5">
-                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Bunga Hemat</span>
-                    <span className="text-sm font-black text-gold">{formatMoney("300000")}</span>
+                    <span className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">Sisa Hutang</span>
+                    <span className="text-sm font-black text-gold">{formatMoney(sisaHutang)}</span>
                   </div>
                </div>
              </div>
