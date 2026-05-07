@@ -28,7 +28,21 @@ export default function Pembayaran() {
   }, []);
 
   async function fetchData() {
-    setLoading(true);
+    const cachedPayments = sessionStorage.getItem("payments_cache");
+    const cachedDebts = sessionStorage.getItem("debts_cache");
+    
+    if (cachedPayments) {
+      const parsed = JSON.parse(cachedPayments);
+      setPayments(parsed);
+      calculateTotalBulanIni(parsed);
+      if (cachedDebts) {
+        setDebts(JSON.parse(cachedDebts));
+        setLoading(false);
+      }
+    } else {
+      setLoading(true);
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -43,12 +57,8 @@ export default function Pembayaran() {
 
       if (!payError && payData) {
         setPayments(payData);
-        const now = new Date();
-        const thisMonth = payData.filter(p => {
-          const d = new Date(p.payment_date);
-          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-        });
-        setTotalBulanIni(thisMonth.reduce((s, p) => s + Number(p.amount || 0), 0));
+        sessionStorage.setItem("payments_cache", JSON.stringify(payData));
+        calculateTotalBulanIni(payData);
       }
 
       // Ambil daftar hutang aktif untuk dropdown pilihan
@@ -58,13 +68,25 @@ export default function Pembayaran() {
         .eq("user_id", user.id)
         .eq("status", "active");
         
-      if (debtData) setDebts(debtData);
+      if (debtData) {
+        setDebts(debtData);
+        sessionStorage.setItem("debts_cache", JSON.stringify(debtData));
+      }
 
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (!cachedPayments || !cachedDebts) setLoading(false);
     }
+  }
+
+  function calculateTotalBulanIni(payData) {
+    const now = new Date();
+    const thisMonth = payData.filter(p => {
+      const d = new Date(p.payment_date);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    setTotalBulanIni(thisMonth.reduce((s, p) => s + Number(p.amount || 0), 0));
   }
 
   const handleSubmit = async (e) => {
@@ -80,6 +102,8 @@ export default function Pembayaran() {
       });
       
       if (res.ok) {
+        sessionStorage.removeItem("debts_cache");
+        sessionStorage.removeItem("payments_cache");
         setIsModalOpen(false);
         setForm({ debt_id: "", amount: "", payment_date: new Date().toISOString().split('T')[0], notes: "" });
         setSuccessMsg("Pembayaran berhasil dicatat & saldo hutang otomatis berkurang! 🎉");

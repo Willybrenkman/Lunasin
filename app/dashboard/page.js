@@ -28,15 +28,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchData() {
+      // 1. Cek cache lokal untuk loading instan
+      const cached = sessionStorage.getItem("debts_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setDebts(parsed);
+        setLoading(false);
+        updateDashboardState(parsed);
+      }
+
       try {
+        // 2. Fetch data terbaru di background
         const response = await fetch("/api/debts");
         const result = await response.json();
         const data = result.data || [];
+        
         setDebts(data);
+        sessionStorage.setItem("debts_cache", JSON.stringify(data));
+        updateDashboardState(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cached) setLoading(false);
+      }
+    }
 
-        if (data.length > 0) {
-          const plan = calculatePlan(data, "snowball", extraPayment);
-          setChartData(plan);
+    function updateDashboardState(data) {
+      if (data.length > 0) {
+        const plan = calculatePlan(data, "snowball", extraPayment);
+        setChartData(plan);
           
           // Calculate premium features
           setInsight(generateInsight({ months: plan.length, totalInterest: plan.reduce((s, p) => s + p.total, 0) }));
@@ -60,11 +80,6 @@ export default function Dashboard() {
           // Default empty state
           setAchievements(getAchievements({ paidOff: 0, progress: 0 }));
         }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
     }
     fetchData();
   }, [extraPayment]);

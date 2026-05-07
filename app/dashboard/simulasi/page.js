@@ -20,14 +20,21 @@ export default function SimulasiPage() {
 
   useEffect(() => {
     async function fetchDebts() {
+      const cached = sessionStorage.getItem("debts_cache");
+      if (cached) {
+        setDebts(JSON.parse(cached));
+        setLoading(false);
+      }
+      
       try {
         const response = await fetch("/api/debts");
         const result = await response.json();
         setDebts(result.data || []);
+        sessionStorage.setItem("debts_cache", JSON.stringify(result.data || []));
       } catch (e) {
         console.error(e);
       } finally {
-        setLoading(false);
+        if (!cached) setLoading(false);
       }
     }
     fetchDebts();

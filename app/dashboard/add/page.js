@@ -55,6 +55,7 @@ export default function AddDebt() {
         })
       });
       if (response.ok) {
+        sessionStorage.removeItem("debts_cache");
         setSuccessMsg("Data hutang berhasil disimpan! 🚀");
         setTimeout(() => {
           router.push("/dashboard/debts");

@@ -16,16 +16,26 @@ export default function LaporanPage() {
 
   useEffect(() => {
     async function fetchData() {
+      const cachedDebts = sessionStorage.getItem("debts_cache");
+      const cachedPayments = sessionStorage.getItem("payments_cache");
+      
+      if (cachedDebts) setDebts(JSON.parse(cachedDebts));
+      if (cachedPayments) setPayments(JSON.parse(cachedPayments));
+      if (cachedDebts && cachedPayments) setLoading(false);
+
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { setLoading(false); return; }
+        if (!user) { if (!cachedDebts) setLoading(false); return; }
 
         // Fetch debts
         const { data: debtsData } = await supabase
           .from("debts")
           .select("*")
           .eq("user_id", user.id);
-        if (debtsData) setDebts(debtsData);
+        if (debtsData) {
+          setDebts(debtsData);
+          sessionStorage.setItem("debts_cache", JSON.stringify(debtsData));
+        }
 
         // Fetch payments (last 6 months)
         const { data: paymentsData } = await supabase
@@ -33,11 +43,14 @@ export default function LaporanPage() {
           .select("*")
           .eq("user_id", user.id)
           .order("payment_date", { ascending: true });
-        if (paymentsData) setPayments(paymentsData);
+        if (paymentsData) {
+          setPayments(paymentsData);
+          sessionStorage.setItem("payments_cache", JSON.stringify(paymentsData));
+        }
       } catch (e) {
         console.error(e);
       } finally {
-        setLoading(false);
+        if (!cachedDebts || !cachedPayments) setLoading(false);
       }
     }
     fetchData();

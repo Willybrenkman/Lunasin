@@ -20,14 +20,21 @@ export default function DebtsPage() {
   }, []);
 
   async function fetchData() {
+    const cached = sessionStorage.getItem("debts_cache");
+    if (cached) {
+      setDebts(JSON.parse(cached));
+      setLoading(false);
+    }
+    
     try {
       const response = await fetch("/api/debts");
       const result = await response.json();
       setDebts(result.data || []);
+      sessionStorage.setItem("debts_cache", JSON.stringify(result.data || []));
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (!cached) setLoading(false);
     }
   }
 
@@ -37,6 +44,7 @@ export default function DebtsPage() {
     try {
       const response = await fetch(`/api/debts?id=${id}`, { method: "DELETE" });
       if (response.ok) {
+        sessionStorage.removeItem("debts_cache");
         showSuccess("Hutang berhasil dihapus!");
         setDebts(debts.filter(d => d.id !== id));
       }
@@ -78,6 +86,7 @@ export default function DebtsPage() {
         })
       });
       if (response.ok) {
+        sessionStorage.removeItem("debts_cache");
         showSuccess("Data hutang berhasil diupdate!");
         setEditModal({ isOpen: false, data: null });
         fetchData(); // Reload data
