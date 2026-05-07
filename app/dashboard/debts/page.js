@@ -1,29 +1,98 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Filter, ChevronRight, Loader2 } from "lucide-react";
+import { Plus, Search, Filter, Loader2, Pencil, Trash2, X, Save, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 
 export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [successMsg, setSuccessMsg] = useState("");
   const { formatMoney } = usePrivacy();
 
+  // Edit Modal State
+  const [editModal, setEditModal] = useState({ isOpen: false, data: null });
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch("/api/debts");
-        const result = await response.json();
-        setDebts(result.data || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
   }, []);
+
+  async function fetchData() {
+    try {
+      const response = await fetch("/api/debts");
+      const result = await response.json();
+      setDebts(result.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleDelete = async (id, name) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus hutang "${name}"? Data yang dihapus tidak bisa dikembalikan.`)) return;
+    
+    try {
+      const response = await fetch(`/api/debts?id=${id}`, { method: "DELETE" });
+      if (response.ok) {
+        showSuccess("Hutang berhasil dihapus!");
+        setDebts(debts.filter(d => d.id !== id));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openEditModal = (debt) => {
+    setEditModal({
+      isOpen: true,
+      data: {
+        id: debt.id,
+        name: debt.name,
+        total: debt.total,
+        sisa: debt.sisa,
+        interest: debt.interest,
+        min_payment: debt.min_payment,
+        status: debt.status,
+      }
+    });
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/debts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editModal.data.id,
+          name: editModal.data.name,
+          total: Number(editModal.data.total),
+          sisa: Number(editModal.data.sisa),
+          interest: Number(editModal.data.interest),
+          min_payment: Number(editModal.data.min_payment),
+          status: editModal.data.status,
+        })
+      });
+      if (response.ok) {
+        showSuccess("Data hutang berhasil diupdate!");
+        setEditModal({ isOpen: false, data: null });
+        fetchData(); // Reload data
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const showSuccess = (msg) => {
+    setSuccessMsg(msg);
+    setTimeout(() => setSuccessMsg(""), 3000);
+  };
 
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
@@ -32,7 +101,17 @@ export default function DebtsPage() {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
+      {/* Toast Notification */}
+      {successMsg && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(34,197,94,0.15)] backdrop-blur-md">
+            <CheckCircle2 size={24} />
+            <span className="font-black text-sm tracking-wide">{successMsg}</span>
+          </div>
+        </div>
+      )}
+
       {/* Filter Bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="relative w-full md:w-96">
@@ -68,7 +147,7 @@ export default function DebtsPage() {
                 <th className="px-8 py-5">Minimum / bln</th>
                 <th className="px-8 py-5">Durasi (Mulai - Selesai)</th>
                 <th className="px-8 py-5 text-center">Status</th>
-                <th className="px-8 py-5"></th>
+                <th className="px-8 py-5 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -82,7 +161,7 @@ export default function DebtsPage() {
               ) : debts.map((d) => (
                 <tr
                   key={d.id}
-                  className="hover:bg-white/[0.02] transition-all cursor-pointer group"
+                  className="hover:bg-white/[0.02] transition-all group"
                 >
                   <td className="px-8 py-6">
                     <p className="font-bold text-white text-sm group-hover:text-[#22C55E] transition-colors">{d.name}</p>
@@ -104,12 +183,31 @@ export default function DebtsPage() {
                     </div>
                   </td>
                   <td className="px-8 py-6 text-center">
-                    <span className="inline-block px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-[9px] font-black rounded-md uppercase tracking-widest border border-[#22C55E]/20">
-                      Aktif
+                    <span className={`inline-block px-3 py-1 text-[9px] font-black rounded-md uppercase tracking-widest border ${
+                      d.status === 'paid_off' 
+                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                        : "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"
+                    }`}>
+                      {d.status === 'paid_off' ? "Lunas" : "Aktif"}
                     </span>
                   </td>
-                  <td className="px-8 py-6 text-right">
-                    <ChevronRight size={20} className="text-gray-600 group-hover:text-gold transition-colors ml-auto" />
+                  <td className="px-8 py-6">
+                    <div className="flex items-center justify-center gap-3">
+                      <button 
+                        onClick={() => openEditModal(d)}
+                        className="p-2 bg-white/5 text-gray-400 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors"
+                        title="Edit Hutang"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(d.id, d.name)}
+                        className="p-2 bg-white/5 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                        title="Hapus Hutang"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -117,6 +215,99 @@ export default function DebtsPage() {
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#0F1319] border border-white/10 w-full max-w-lg rounded-3xl p-8 shadow-2xl relative">
+            <button 
+              onClick={() => setEditModal({ isOpen: false, data: null })}
+              className="absolute top-6 right-6 text-gray-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            <h2 className="text-2xl font-black text-white mb-6">Edit Data Hutang</h2>
+            
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Nama Hutang</label>
+                <input 
+                  type="text" 
+                  value={editModal.data.name}
+                  onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, name: e.target.value}}))}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                  required 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Total Hutang</label>
+                  <input 
+                    type="number" 
+                    value={editModal.data.total}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, total: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Sisa Hutang</label>
+                  <input 
+                    type="number" 
+                    value={editModal.data.sisa}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, sisa: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                    required 
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Bunga / Tahun (%)</label>
+                  <input 
+                    type="number" 
+                    value={editModal.data.interest}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, interest: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Cicilan Minimum</label>
+                  <input 
+                    type="number" 
+                    value={editModal.data.min_payment}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, min_payment: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                    required 
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Status Hutang</label>
+                <select 
+                  value={editModal.data.status}
+                  onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, status: e.target.value}}))}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                >
+                  <option value="active">Aktif (Belum Lunas)</option>
+                  <option value="paid_off">Lunas (Paid Off)</option>
+                </select>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isSaving}
+                className="w-full bg-[#D4AF37] text-black font-black py-4 rounded-xl mt-4 flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all text-xs uppercase tracking-widest"
+              >
+                {isSaving ? <Loader2 className="animate-spin" size={18} /> : <><Save size={18} /> Simpan Perubahan</>}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
