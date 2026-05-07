@@ -1,9 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
 // Auth callback handler.
 // Setelah user klik magic link di email, Supabase redirect ke sini dengan ?code=xxx
-// Kita tukar code -> session, lalu set cookie dan redirect ke /dashboard.
+// Kita tukar code -> session menggunakan server client yang bisa baca/tulis cookies.
 
 export async function GET(request) {
   const requestUrl = new URL(request.url);
@@ -29,48 +29,48 @@ export async function GET(request) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(new URL("/login?error=server_misconfigured", request.url));
+    return NextResponse.redirect(
+      new URL("/login?error=server_misconfigured", request.url)
+    );
   }
 
-  try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+  // Buat response terlebih dahulu — kita perlu objek response untuk set cookies
+  const response = NextResponse.redirect(new URL("/dashboard", request.url));
 
-    if (error || !data?.session) {
+  try {
+    // Buat Supabase server client dengan cookie adapter
+    // Client ini bisa membaca cookie dari request (termasuk code_verifier PKCE)
+    // dan menulis session cookies ke response
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Set cookies di response agar browser menyimpannya
+            response.cookies.set(name, value, {
+              ...options,
+              // Override opsi agar kompatibel dengan browser
+              path: "/",
+              sameSite: "lax",
+              secure: process.env.NODE_ENV === "production",
+            });
+          });
+        },
+      },
+    });
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
       console.error("exchangeCodeForSession error:", error);
       const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("error", "Gagal memverifikasi link login.");
+      loginUrl.searchParams.set("error", "Gagal memverifikasi link login. Silakan coba lagi.");
       return NextResponse.redirect(loginUrl);
     }
 
-    // Buat response redirect ke dashboard
-    const response = NextResponse.redirect(new URL("/dashboard", request.url));
-
-    // Set session cookie agar middleware bisa membaca status login
-    // Format cookie name mengikuti standar Supabase: sb-<project-ref>-auth-token
-    const projectRef = supabaseUrl
-      .replace("https://", "")
-      .replace(".supabase.co", "")
-      .split(".")[0];
-
-    const cookieName = `sb-${projectRef}-auth-token`;
-    const cookieValue = JSON.stringify({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-      expires_at: data.session.expires_at,
-      expires_in: data.session.expires_in,
-      token_type: data.session.token_type,
-      user: data.session.user,
-    });
-
-    response.cookies.set(cookieName, cookieValue, {
-      httpOnly: false, // perlu false agar Supabase JS client bisa baca
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 hari
-    });
-
+    // Session berhasil di-exchange — cookies sudah di-set via setAll callback
     return response;
   } catch (err) {
     console.error("Auth callback error:", err);
