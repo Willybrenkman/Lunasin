@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Wallet, LayoutDashboard, CreditCard, BarChart3,
   Bell, Settings, LogOut, HelpCircle, Search, FileText,
-  Eye, EyeOff, Gift, BookOpen
+  Eye, EyeOff, Gift, BookOpen, X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +18,9 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const { isPrivate, togglePrivacy, formatMoney } = usePrivacy();
   const [profile, setProfile] = useState({ display_name: "User", is_pro: true, email: "" });
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -28,11 +31,54 @@ export default function DashboardLayout({ children }) {
           .select('display_name, is_pro, email')
           .eq('id', user.id)
           .single();
-        if (data) setProfile(data);
+        if (data) {
+          setProfile(data);
+
+          // Auto-sync: jika profile belum pro, cek apakah email sudah punya voucher
+          if (!data.is_pro) {
+            const { data: hasVoucher } = await supabase.rpc(
+              'check_email_has_voucher',
+              { p_email: user.email }
+            );
+            if (hasVoucher) {
+              // Update profile ke pro
+              await supabase
+                .from('profiles')
+                .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
+                .eq('id', user.id);
+              setProfile(prev => ({ ...prev, is_pro: true }));
+            }
+          }
+        }
       }
     }
     loadProfile();
   }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
+
+  // Menu items for search
+  const menuItems = [
+    { label: "Dashboard", href: "/dashboard", icon: "📊" },
+    { label: "Hutang Saya", href: "/dashboard/debts", icon: "💳" },
+    { label: "Simulasi", href: "/dashboard/simulasi", icon: "📈" },
+    { label: "Pembayaran", href: "/dashboard/pembayaran", icon: "💰" },
+    { label: "Laporan", href: "/dashboard/laporan", icon: "📄" },
+    { label: "Pengingat", href: "/dashboard/pengingat", icon: "🔔" },
+    { label: "Pengaturan", href: "/dashboard/pengaturan", icon: "⚙️" },
+    { label: "Konsultan AI", href: "/dashboard/ai", icon: "✨" },
+    { label: "Bonus Premium", href: "/dashboard/bonus", icon: "🎁" },
+    { label: "Panduan Aplikasi", href: "/dashboard/panduan", icon: "📖" },
+  ];
+
+  const filteredMenu = searchQuery
+    ? menuItems.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : menuItems;
 
   const handleLogout = async () => {
     try {
@@ -124,10 +170,18 @@ export default function DashboardLayout({ children }) {
               >
                 {isPrivate ? <EyeOff size={22} /> : <Eye size={22} />}
               </button>
-              <button className="p-2.5 rounded-xl transition-all text-gray-400 hover:text-white hover:bg-white/5">
+              <button
+                onClick={() => setShowSearch(true)}
+                className="p-2.5 rounded-xl transition-all text-gray-400 hover:text-white hover:bg-white/5"
+                title="Cari Menu"
+              >
                 <Search size={22} />
               </button>
-              <button className="p-2.5 rounded-xl transition-all relative text-gray-400 hover:text-white hover:bg-white/5">
+              <button
+                onClick={() => router.push('/dashboard/pengingat')}
+                className="p-2.5 rounded-xl transition-all relative text-gray-400 hover:text-white hover:bg-white/5"
+                title="Notifikasi & Pengingat"
+              >
                 <Bell size={22} />
                 <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#06080C]"></span>
               </button>
@@ -144,6 +198,51 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
         </header>
+
+        {/* Search Overlay */}
+        {showSearch && (
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4" onClick={() => setShowSearch(false)}>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div
+              className="relative w-full max-w-lg bg-[#0B0F14] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
+                <Search size={20} className="text-gray-500" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Cari menu..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-transparent text-white outline-none placeholder:text-gray-500 font-medium"
+                />
+                <button onClick={() => { setShowSearch(false); setSearchQuery(""); }} className="text-gray-500 hover:text-white transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="max-h-80 overflow-y-auto p-2">
+                {filteredMenu.length > 0 ? filteredMenu.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => { setShowSearch(false); setSearchQuery(""); }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
+                      pathname === item.href
+                        ? "bg-gold/10 text-gold"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </Link>
+                )) : (
+                  <p className="text-center text-gray-500 text-sm py-6">Tidak ditemukan</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="p-12 flex-1 max-w-[1600px] mx-auto w-full">
           <ProLock isLocked={!profile.is_pro && !['/dashboard', '/dashboard/simulasi'].includes(pathname)}>

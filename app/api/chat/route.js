@@ -14,15 +14,7 @@ function getSupabase() {
   return createClient(url, key);
 }
 
-// Dummy debts for when Supabase isn't connected
-const DUMMY_DEBTS = [
-  { name: "Shopee PayLater", total: 1500000, sisa: 300000, interest: 0, min_payment: 300000 },
-  { name: "Kartu Kredit BCA", total: 5000000, sisa: 3200000, interest: 16, min_payment: 500000 },
-  { name: "Kredit Motor Honda", total: 12000000, sisa: 4600000, interest: 11, min_payment: 600000 },
-  { name: "Pinjaman Online A", total: 2000000, sisa: 1100000, interest: 24, min_payment: 300000 },
-  { name: "Kredivo", total: 3000000, sisa: 1000000, interest: 0, min_payment: 250000 },
-  { name: "Pinjaman Teman", total: 1000000, sisa: 1000000, interest: 0, min_payment: 200000 },
-];
+// Tidak ada data dummy — hanya analisis data asli user
 
 function formatRp(num) {
   return `Rp ${Number(num).toLocaleString("id-ID")}`;
@@ -103,11 +95,17 @@ export async function POST(req) {
     const { message } = await req.json();
 
     // Coba ambil data hutang dari Supabase
-    let debts = DUMMY_DEBTS;
+    let debts = [];
     const supabase = getSupabase();
     if (supabase) {
       const { data } = await supabase.from("debts").select("*");
       if (data && data.length > 0) debts = data;
+    }
+
+    if (debts.length === 0) {
+      return NextResponse.json({
+        response: "Kamu belum menambahkan data hutang. Silakan tambahkan hutang terlebih dahulu di menu **Hutang Saya** agar saya bisa menganalisis dan memberikan saran yang tepat untuk kondisi keuanganmu. 📊"
+      });
     }
 
     const response = generateResponse(message, debts);

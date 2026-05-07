@@ -25,16 +25,6 @@ export default function DebtsPage() {
     fetchData();
   }, []);
 
-  // Fallback dummy data kalau API belum siap
-  const debtsList = debts.length > 0 ? debts : [
-    { id: 1, name: "Shopee PayLater", total: 1500000, sisa: 300000, interest: 0, min_payment: 300000, jatuhTempo: "-" },
-    { id: 2, name: "Kartu Kredit BCA", total: 5000000, sisa: 3200000, interest: 18, min_payment: 500000, jatuhTempo: "10 Jul 2024" },
-    { id: 3, name: "Kredit Motor Honda", total: 12000000, sisa: 4600000, interest: 11, min_payment: 600000, jatuhTempo: "15 Agu 2024" },
-    { id: 4, name: "Pinjaman Online A", total: 2000000, sisa: 1100000, interest: 24, min_payment: 300000, jatuhTempo: "5 Jul 2024" },
-    { id: 5, name: "Kredivo", total: 3000000, sisa: 1000000, interest: 0, min_payment: 250000, jatuhTempo: "-" },
-    { id: 6, name: "Pinjaman Teman", total: 1000000, sisa: 1000000, interest: 0, min_payment: 200000, jatuhTempo: "-" },
-  ];
-
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
       <Loader2 className="animate-spin text-gold" size={40} />
@@ -82,7 +72,14 @@ export default function DebtsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {debtsList.map((d) => (
+              {debts.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-8 py-16 text-center">
+                    <p className="text-gray-500 font-bold text-sm mb-2">Belum ada data hutang</p>
+                    <p className="text-gray-600 text-xs">Klik tombol "Tambah Hutang" untuk mulai mencatat hutangmu.</p>
+                  </td>
+                </tr>
+              ) : debts.map((d) => (
                 <tr
                   key={d.id}
                   className="hover:bg-white/[0.02] transition-all cursor-pointer group"

@@ -19,15 +19,8 @@ export default function DebtChart({ data, strategy = "Smart Priority", onStrateg
   const { formatMoney, isPrivate } = usePrivacy();
   const isLight = theme === "light";
 
-  // Fallback dummy data kalau tidak ada data
-  const chartData = (data && data.length > 0) ? data : [
-    { month: 1, total: 8200000, baseline: 8200000 },
-    { month: 3, total: 7000000, baseline: 7800000 },
-    { month: 6, total: 5200000, baseline: 7000000 },
-    { month: 9, total: 3500000, baseline: 6000000 },
-    { month: 12, total: 1800000, baseline: 4800000 },
-    { month: 14, total: 0, baseline: 3500000 },
-  ];
+  // Gunakan data dari props langsung
+  const chartData = (data && data.length > 0) ? data : [];
 
   const [open, setOpen] = useState(false);
   const strategies = ["Smart Priority", "Snowball", "Avalanche"];

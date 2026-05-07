@@ -12,16 +12,28 @@ import { usePrivacy } from "@/components/privacy/PrivacyContext";
 export default function SimulasiPage() {
   const [chartData, setChartData] = useState([]);
   const [strategy, setStrategy] = useState("Smart Priority");
+  const [debts, setDebts] = useState([]);
   const { formatMoney } = usePrivacy();
 
   useEffect(() => {
-    const dummyDebts = [
-      { id: 1, name: "Shopee PayLater", total: 1500000, interest: 0, min_payment: 300000 },
-      { id: 2, name: "Kartu Kredit BCA", total: 5000000, interest: 16, min_payment: 500000 }
-    ];
-    const plan = calculatePlan(dummyDebts, strategy.toLowerCase(), 500000);
-    setChartData(plan);
-  }, [strategy]);
+    async function fetchDebts() {
+      try {
+        const response = await fetch("/api/debts");
+        const result = await response.json();
+        setDebts(result.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    fetchDebts();
+  }, []);
+
+  useEffect(() => {
+    if (debts.length > 0) {
+      const plan = calculatePlan(debts, strategy.toLowerCase(), 500000);
+      setChartData(plan);
+    }
+  }, [strategy, debts]);
 
   const whatIfData = [
     { extra: formatMoney("0"), months: "24 bulan", totalInterest: formatMoney("4050000"), savings: formatMoney("0"), status: "" },
