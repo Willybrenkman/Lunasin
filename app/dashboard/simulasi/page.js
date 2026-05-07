@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import DebtChart from "@/components/DebtChart";
 import { useEffect, useState } from "react";
-import { calculatePlan } from "@/lib/calculate";
+import { calculatePlan, simulate } from "@/lib/calculate";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 
@@ -43,23 +43,21 @@ export default function SimulasiPage() {
   const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
 
-  // Hitung what-if analysis dari data real
+  // Hitung what-if analysis dari data real menggunakan fungsi simulasi aktual
   const extraAmounts = [0, 250000, 500000, 1000000, 1500000];
-  const baselineMonths = totalMinPayment > 0 ? Math.ceil(totalSisa / totalMinPayment) : 0;
-
+  
   const whatIfData = debts.length > 0 ? extraAmounts.map((extra, idx) => {
-    const monthlyTotal = totalMinPayment + extra;
-    const months = monthlyTotal > 0 ? Math.ceil(totalSisa / monthlyTotal) : 0;
-    const avgInterest = debts.reduce((s, d) => s + Number(d.interest || 0), 0) / debts.length;
-    const estInterest = Math.round(totalSisa * (avgInterest / 100 / 12) * months);
-    const baseInterest = Math.round(totalSisa * (avgInterest / 100 / 12) * baselineMonths);
-    const savings = baseInterest - estInterest;
+    // Jalankan simulasi baseline (0 extra) dan skenario (extra)
+    const baseline = simulate(debts, strategy.toLowerCase(), 0);
+    const sim = simulate(debts, strategy.toLowerCase(), extra);
+    
+    const savings = Math.max(0, baseline.totalInterest - sim.totalInterest);
 
     return {
       extra: formatMoney(extra),
-      months: `${months} bulan`,
-      totalInterest: formatMoney(estInterest),
-      savings: formatMoney(Math.max(savings, 0)),
+      months: `${sim.months} bulan`,
+      totalInterest: formatMoney(sim.totalInterest),
+      savings: formatMoney(savings),
       status: idx === 2 ? "Optimal" : "",
     };
   }) : [];
