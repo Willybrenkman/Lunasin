@@ -1,0 +1,170 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Wallet, LayoutDashboard, CreditCard, BarChart3,
+  Bell, Settings, LogOut, HelpCircle, Search, FileText,
+  Eye, EyeOff, Gift, BookOpen
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import ThemeToggle from "@/components/theme/ThemeToggle";
+import { usePrivacy } from "@/components/privacy/PrivacyContext";
+import ProLock from "@/components/pro/ProLock";
+
+export default function DashboardLayout({ children }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isPrivate, togglePrivacy, formatMoney } = usePrivacy();
+  const [profile, setProfile] = useState({ display_name: "User", is_pro: true, email: "" });
+
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('display_name, is_pro, email')
+          .eq('id', user.id)
+          .single();
+        if (data) setProfile(data);
+      }
+    }
+    loadProfile();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
+    router.push("/");
+  };
+
+  const pageTitle = () => {
+    const last = pathname.split("/").pop();
+    if (last === "dashboard") return "Dashboard";
+    if (last === "debts") return "Hutang Saya";
+    if (last === "simulasi") return "Simulasi";
+    if (last === "pembayaran") return "Pembayaran";
+    if (last === "laporan") return "Laporan";
+    if (last === "pengingat") return "Pengingat";
+    if (last === "pengaturan") return "Pengaturan";
+    return last.replace("-", " ");
+  };
+
+  return (
+    <div className="min-h-screen flex bg-[#06080C] text-white font-sans">
+      {/* Sidebar */}
+      <aside className="w-[280px] p-6 hidden lg:flex flex-col sticky top-0 h-screen bg-[#0A0D12] border-r border-white/5 shadow-2xl z-30">
+        <div className="flex items-center gap-3 px-4 mb-12">
+          <div className="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+            <Wallet className="text-black" size={22} />
+          </div>
+          <span className="text-xl font-black tracking-tight text-white">Lunasin.id</span>
+        </div>
+
+        <nav className="flex flex-col gap-1.5 px-2">
+          <SidebarLink icon={<LayoutDashboard size={20} />} label="Dashboard" href="/dashboard" active={pathname === "/dashboard"} />
+          <SidebarLink icon={<CreditCard size={20} />} label="Hutang Saya" href="/dashboard/debts" active={pathname === "/dashboard/debts"} />
+          <SidebarLink icon={<BarChart3 size={20} />} label="Simulasi" href="/dashboard/simulasi" active={pathname === "/dashboard/simulasi"} />
+          <SidebarLink icon={<Wallet size={20} />} label="Pembayaran" href="/dashboard/pembayaran" active={pathname === "/dashboard/pembayaran"} />
+          <SidebarLink icon={<FileText size={20} />} label="Laporan" href="/dashboard/laporan" active={pathname === "/dashboard/laporan"} />
+          <SidebarLink icon={<Bell size={20} />} label="Pengingat" href="/dashboard/pengingat" active={pathname === "/dashboard/pengingat"} />
+          <SidebarLink icon={<Settings size={20} />} label="Pengaturan" href="/dashboard/pengaturan" active={pathname === "/dashboard/pengaturan"} />
+          
+          <div className="my-2 border-t border-white/5"></div>
+          <SidebarLink icon={<span className="text-[#D4AF37]">✨</span>} label="Konsultan AI" href="/dashboard/ai" active={pathname === "/dashboard/ai"} />
+          <SidebarLink icon={<Gift size={20} />} label="Bonus Premium" href="/dashboard/bonus" active={pathname === "/dashboard/bonus"} />
+          <SidebarLink icon={<BookOpen size={20} />} label="Panduan Aplikasi" href="/dashboard/panduan" active={pathname === "/dashboard/panduan"} />
+        </nav>
+
+        {/* Status Card */}
+        <div className="mt-10 mx-2 p-6 rounded-2xl bg-gradient-to-br from-gold/10 to-transparent border border-gold/20 relative overflow-hidden">
+          <div className="relative z-10">
+            <p className="text-[10px] text-gold mb-2 font-black uppercase tracking-widest">✨ Status Member</p>
+            <p className="text-xs font-bold leading-relaxed text-gray-400">
+              {profile.is_pro 
+                ? "Saat ini Anda sedang berada di versi PRO. Semua fitur premium terbuka selamanya." 
+                : "Anda menggunakan versi Gratis. Upgrade ke PRO untuk membuka semua fitur."}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Nav */}
+        <div className="mt-auto flex flex-col gap-1 border-t border-white/5 pt-6 px-2">
+          <SidebarLink icon={<HelpCircle size={20} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20butuh%20bantuan" target="_blank" />
+          <button onClick={handleLogout} className="flex items-center gap-4 p-3 rounded-xl transition-all duration-300 font-bold text-[13px] text-gray-500 hover:text-white hover:bg-white/5">
+            <LogOut size={20} />
+            <span>Keluar</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden relative">
+        {/* Header */}
+        <header className="backdrop-blur-md bg-[#06080C]/80 border-b border-white/5 py-6 px-12 flex justify-between items-center sticky top-0 z-20">
+          <div>
+            <h1 className="text-[26px] font-black tracking-tight text-white capitalize">
+              {pageTitle()}
+            </h1>
+            <p className="text-[13px] text-gray-500 font-bold mt-1">Ringkasan kondisi hutangmu saat ini</p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button 
+                onClick={togglePrivacy}
+                className="p-2.5 rounded-xl transition-all text-gray-400 hover:text-white hover:bg-white/5"
+                title={isPrivate ? "Tampilkan Saldo" : "Sembunyikan Saldo"}
+              >
+                {isPrivate ? <EyeOff size={22} /> : <Eye size={22} />}
+              </button>
+              <button className="p-2.5 rounded-xl transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                <Search size={22} />
+              </button>
+              <button className="p-2.5 rounded-xl transition-all relative text-gray-400 hover:text-white hover:bg-white/5">
+                <Bell size={22} />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#06080C]"></span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-5 pl-6 border-l border-white/5">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-black text-white">Halo, {profile.display_name}</p>
+                <p className="text-[10px] text-gold font-black uppercase tracking-widest mt-0.5">{profile.is_pro ? "Pro Member" : "Free Account"}</p>
+              </div>
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 p-0.5 hover:scale-105 transition-transform cursor-pointer bg-[#0F1319]">
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" className="w-full h-full object-cover rounded-[0.5rem]" />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="p-12 flex-1 max-w-[1600px] mx-auto w-full">
+          <ProLock isLocked={!profile.is_pro && !['/dashboard', '/dashboard/simulasi'].includes(pathname)}>
+            {children}
+          </ProLock>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function SidebarLink({ icon, label, active, href, target }) {
+  return (
+    <Link href={href} target={target} className={`
+      flex items-center gap-4 p-3 rounded-xl transition-all duration-300 font-bold text-[13px] relative
+      ${active
+        ? "bg-gold/10 text-gold border-l-4 border-gold pl-3"
+        : "text-gray-500 hover:text-white hover:bg-white/5 border-l-4 border-transparent"}
+    `}>
+      <span className={active ? "text-gold" : ""}>{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+}
