@@ -14,6 +14,8 @@ export default function SimulasiPage() {
   const [strategy, setStrategy] = useState("Smart Priority");
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [extraPaymentInput, setExtraPaymentInput] = useState("500000");
+  const [extraPayment, setExtraPayment] = useState(500000);
   const { formatMoney } = usePrivacy();
 
   useEffect(() => {
@@ -33,10 +35,10 @@ export default function SimulasiPage() {
 
   useEffect(() => {
     if (debts.length > 0) {
-      const plan = calculatePlan(debts, strategy.toLowerCase(), 500000);
+      const plan = calculatePlan(debts, strategy.toLowerCase(), extraPayment);
       setChartData(plan);
     }
-  }, [strategy, debts]);
+  }, [strategy, debts, extraPayment]);
 
   // Hitung summary dari data real
   const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
@@ -119,11 +121,22 @@ export default function SimulasiPage() {
             </div>
             
             <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
-              <div className="flex justify-between items-center">
-                 <p className="text-[11px] text-gray-500 font-bold">Extra Payment / bulan</p>
-                 <p className="text-sm font-black text-white">{formatMoney("500000")}</p>
+              <div className="flex flex-col gap-2">
+                 <label className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Extra Payment / bulan (Rp)</label>
+                 <div className="relative">
+                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rp</span>
+                   <input 
+                     type="number"
+                     value={extraPaymentInput}
+                     onChange={(e) => setExtraPaymentInput(e.target.value)}
+                     className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white font-black outline-none focus:border-gold transition-colors"
+                   />
+                 </div>
               </div>
-              <button className="w-full bg-[#D4AF37] text-black font-black py-4 rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:brightness-110 transition-all text-xs uppercase tracking-widest mt-2">
+              <button 
+                onClick={() => setExtraPayment(Number(extraPaymentInput) || 0)}
+                className="w-full bg-[#D4AF37] text-black font-black py-4 rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:brightness-110 active:scale-95 transition-all text-xs uppercase tracking-widest mt-2"
+              >
                 Jalankan Simulasi
               </button>
             </div>
