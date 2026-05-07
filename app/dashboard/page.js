@@ -258,6 +258,7 @@ export default function Dashboard() {
                 <th className="px-8 py-5">Nama Hutang</th>
                 <th className="px-8 py-5">Total</th>
                 <th className="px-8 py-5">Sisa</th>
+                <th className="px-8 py-5">Tagihan</th>
                 <th className="px-8 py-5">Bunga</th>
                 <th className="px-8 py-5">Minimum / bln</th>
                 <th className="px-8 py-5">Durasi (Mulai - Selesai)</th>
@@ -266,16 +267,19 @@ export default function Dashboard() {
             </thead>
             <tbody className="divide-y divide-white/5">
               {debts.map((d) => (
-                <DebtRow
-                  key={d.id}
-                  name={d.name}
-                  total={formatMoney(d.total)}
-                  sisa={formatMoney(d.sisa || d.total)}
-                  interest={`${d.interest}%`}
-                  min={formatMoney(d.min_payment)}
-                  tanggalMulai={d.tanggal_mulai}
-                  jatuhTempo={d.jatuh_tempo}
-                />
+                  <DebtRow
+                    key={d.id}
+                    name={d.name}
+                    total={formatMoney(d.total)}
+                    sisa={formatMoney(d.sisa ?? d.total)}
+                    tanggalTagihan={d.tanggal_tagihan}
+                    interest={`${d.interest}%`}
+                    min={formatMoney(d.min_payment)}
+                    tanggalMulai={d.tanggal_mulai}
+                    jatuhTempo={d.jatuh_tempo}
+                    status={d.status}
+                    sisaRaw={Number(d.sisa ?? d.total)}
+                  />
               ))}
             </tbody>
           </table>
@@ -285,12 +289,15 @@ export default function Dashboard() {
   );
 }
 
-function DebtRow({ name, total, sisa, interest, min, tanggalMulai, jatuhTempo }) {
+function DebtRow({ name, total, sisa, tanggalTagihan, interest, min, tanggalMulai, jatuhTempo, status, sisaRaw }) {
+  const isPaid = status === 'paid_off' || sisaRaw <= 0;
+
   return (
     <tr className="hover:bg-white/[0.02] transition-colors cursor-pointer group">
       <td className="px-8 py-6 font-bold text-white text-sm group-hover:text-[#22C55E]">{name}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">{total}</td>
       <td className="px-8 py-6 font-bold text-white text-sm">{sisa}</td>
+      <td className="px-8 py-6 text-[13px] text-gray-400 font-bold">{tanggalTagihan ? `Tgl ${tanggalTagihan}` : "-"}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">{interest}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">{min}</td>
       <td className="px-8 py-6 text-[13px] text-gray-400">
@@ -300,7 +307,11 @@ function DebtRow({ name, total, sisa, interest, min, tanggalMulai, jatuhTempo })
         </div>
       </td>
       <td className="px-8 py-6 text-center">
-        <span className="inline-block px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-[9px] font-black rounded-md uppercase tracking-widest border border-[#22C55E]/20">Aktif</span>
+        {isPaid ? (
+          <span className="inline-block px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-[9px] font-black rounded-md uppercase tracking-widest border border-[#22C55E]/20">Lunas</span>
+        ) : (
+          <span className="inline-block px-3 py-1 bg-white/5 text-gray-400 text-[9px] font-black rounded-md uppercase tracking-widest border border-white/10">Aktif</span>
+        )}
       </td>
     </tr>
   );
