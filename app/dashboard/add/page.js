@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Loader2, Info, Wallet, Percent, CreditCard, Calendar, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Info, Wallet, Percent, CreditCard, Calendar, CalendarCheck, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default function AddDebt() {
@@ -17,6 +17,7 @@ export default function AddDebt() {
     notes: ""
   });
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
   const router = useRouter();
 
   // Hitung durasi otomatis
@@ -53,7 +54,12 @@ export default function AddDebt() {
           notes: form.notes || null,
         })
       });
-      if (response.ok) router.push("/dashboard/debts");
+      if (response.ok) {
+        setSuccessMsg("Data hutang berhasil disimpan! 🚀");
+        setTimeout(() => {
+          router.push("/dashboard/debts");
+        }, 2000);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -62,7 +68,17 @@ export default function AddDebt() {
   };
 
   return (
-    <div className="min-h-screen bg-[#06080C] p-6 md:p-10 flex justify-center text-white">
+    <div className="min-h-screen bg-[#06080C] p-6 md:p-10 flex justify-center text-white relative">
+      {/* Toast Notification */}
+      {successMsg && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(34,197,94,0.15)] backdrop-blur-md">
+            <CheckCircle2 size={24} />
+            <span className="font-black text-sm tracking-wide">{successMsg}</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-2xl">
         <header className="mb-10">
           <Link href="/dashboard" className="text-gray-500 hover:text-white flex items-center gap-2 mb-6 transition-colors group font-medium">

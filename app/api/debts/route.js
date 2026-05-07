@@ -1,16 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
 
-function getSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key || url.includes("YOUR_")) return null;
-  return createClient(url, key);
-}
-
 export async function GET(req) {
-  const supabase = getSupabase();
-  if (!supabase) return NextResponse.json({ data: [] });
+  const supabase = await createSupabaseServerClient();
 
   try {
     // Ambil user dari header Authorization jika ada
@@ -32,10 +24,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  const supabase = getSupabase();
-  if (!supabase) {
-    return NextResponse.json({ error: "Database belum terhubung" }, { status: 503 });
-  }
+  const supabase = await createSupabaseServerClient();
 
   try {
     const body = await req.json();
