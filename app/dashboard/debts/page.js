@@ -305,6 +305,37 @@ export default function DebtsPage() {
                   className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Tanggal Mulai</label>
+                  <input 
+                    type="date" 
+                    value={editModal.data.tanggal_mulai || ""}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, tanggal_mulai: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Target Lunas</label>
+                  <input 
+                    type="date" 
+                    value={editModal.data.jatuh_tempo || ""}
+                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, jatuh_tempo: e.target.value}}))}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Catatan</label>
+                <textarea 
+                  value={editModal.data.notes || ""}
+                  onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, notes: e.target.value}}))}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors min-h-[80px]"
+                  placeholder="Catatan tambahan (opsional)"
+                />
+              </div>
               
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Status Hutang</label>
