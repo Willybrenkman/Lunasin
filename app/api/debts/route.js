@@ -61,10 +61,23 @@ export async function PUT(req) {
   const supabase = await createSupabaseServerClient();
   try {
     const body = await req.json();
-    const { id, ...updateData } = body;
+    const { id, name, total, sisa, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, status, notes } = body;
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const updateData = {
+      name,
+      total: Number(total),
+      sisa: Number(sisa),
+      interest: Number(interest),
+      min_payment: Number(min_payment),
+      tanggal_mulai: tanggal_mulai || null,
+      jatuh_tempo: jatuh_tempo || null,
+      tanggal_tagihan: tanggal_tagihan ? Number(tanggal_tagihan) : null,
+      status,
+      notes
+    };
 
     const { data, error } = await supabase
       .from("debts")
