@@ -21,14 +21,13 @@ export default function PengingatPage() {
         if (!user) { setLoading(false); return; }
         setUserEmail(user.email || "");
 
-        // Fetch debts with jatuh_tempo
+        // Fetch debts with tanggal_tagihan
         const { data, error } = await supabase
           .from("debts")
-          .select("name, jatuh_tempo, status")
+          .select("name, tanggal_tagihan, status")
           .eq("user_id", user.id)
           .eq("status", "active")
-          .not("jatuh_tempo", "is", null)
-          .order("jatuh_tempo", { ascending: true });
+          .not("tanggal_tagihan", "is", null);
 
         if (!error && data) setDebts(data);
       } catch (e) {
@@ -40,18 +39,22 @@ export default function PengingatPage() {
     fetchData();
   }, []);
 
-  // Compute upcoming debts from real data
+  // Compute upcoming debts from real data based on monthly schedule (tanggal_tagihan)
   const today = new Date();
-  const upcomingDebts = debts.map(d => {
-    const dueDate = new Date(d.jatuh_tempo);
-    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+  const upcomingDebts = debts.filter(d => d.tanggal_tagihan).map(d => {
+    let dueDate = new Date(today.getFullYear(), today.getMonth(), d.tanggal_tagihan);
+    
+    // If the due date has already passed this month, schedule it for next month
+    // We give a 1-day grace period where it still shows "Hari ini!"
+    if (dueDate.getDate() < today.getDate()) {
+      dueDate = new Date(today.getFullYear(), today.getMonth() + 1, d.tanggal_tagihan);
+    }
+
+    const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     let status = "";
     let urgent = false;
 
-    if (diffDays < 0) {
-      status = "Sudah jatuh tempo";
-      urgent = true;
-    } else if (diffDays === 0) {
+    if (diffDays === 0) {
       status = "Hari ini!";
       urgent = true;
     } else if (diffDays <= 7) {
@@ -67,8 +70,9 @@ export default function PengingatPage() {
       date: dueDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }),
       status,
       urgent,
+      diffDays
     };
-  });
+  }).sort((a, b) => a.diffDays - b.diffDays); // Sort by closest due date
 
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">

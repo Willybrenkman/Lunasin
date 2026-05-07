@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Clock, ArrowUpRight, Download, Loader2, Plus, X, Save, Wallet } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
+import confetti from "canvas-confetti";
 
 export default function Pembayaran() {
   const [payments, setPayments] = useState([]);
@@ -102,12 +103,29 @@ export default function Pembayaran() {
       });
       
       if (res.ok) {
+        const debtPaid = debts.find(d => d.id === form.debt_id);
+        const sisaSebelumnya = Number(debtPaid?.sisa ?? debtPaid?.total ?? 0);
+        const amountPaid = Number(form.amount);
+
         sessionStorage.removeItem("debts_cache");
         sessionStorage.removeItem("payments_cache");
         setIsModalOpen(false);
         setForm({ debt_id: "", amount: "", payment_date: new Date().toISOString().split('T')[0], notes: "" });
-        setSuccessMsg("Pembayaran berhasil dicatat & saldo hutang otomatis berkurang! 🎉");
-        setTimeout(() => setSuccessMsg(""), 4000);
+
+        if (amountPaid >= sisaSebelumnya) {
+          // LUNAS! Fire Confetti!
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ['#D4AF37', '#22C55E', '#FFFFFF']
+          });
+          setSuccessMsg("SELAMAT! SATU HUTANG BERHASIL DITAKLUKKAN! 🏆🎉");
+        } else {
+          setSuccessMsg("Pembayaran berhasil dicatat & saldo hutang otomatis berkurang! 🚀");
+        }
+        
+        setTimeout(() => setSuccessMsg(""), 5000);
         fetchData(); // Reload data
       }
     } catch (error) {
