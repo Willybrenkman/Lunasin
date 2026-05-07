@@ -45,7 +45,8 @@ export default function Dashboard() {
           // Calculate achievements dynamically
           const totalAwal = data.reduce((s, d) => s + Number(d.total || 0), 0);
           const totalSisa = data.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
-          const progress = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
+          const progressRaw = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
+          const progress = Math.max(0, Math.min(100, progressRaw)); // Clamp between 0-100
           
           // Strict check for paid off debts: either status is paid_off, or sisa is strictly <= 0 and total > 0
           const paidOff = data.filter(d => {
@@ -72,8 +73,9 @@ export default function Dashboard() {
 
   // Compute summary stats from actual data
   const totalHutang = debts.reduce((s, d) => s + Number(d.total || 0), 0);
-  const sisaHutang = debts.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
-  const progressPct = totalHutang > 0 ? Math.round(((totalHutang - sisaHutang) / totalHutang) * 100) : 0;
+  const sisaHutang = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
+  const progressPctRaw = totalHutang > 0 ? Math.round(((totalHutang - sisaHutang) / totalHutang) * 100) : 0;
+  const progressPct = Math.max(0, Math.min(100, progressPctRaw)); // Clamp between 0-100
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

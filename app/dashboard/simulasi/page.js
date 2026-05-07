@@ -39,7 +39,7 @@ export default function SimulasiPage() {
   }, [strategy, debts]);
 
   // Hitung summary dari data real
-  const totalSisa = debts.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
+  const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
   const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
 

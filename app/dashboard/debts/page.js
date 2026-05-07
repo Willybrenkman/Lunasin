@@ -170,7 +170,7 @@ export default function DebtsPage() {
                     {formatMoney(d.total)}
                   </td>
                   <td className="px-8 py-6 font-bold text-white text-sm">
-                    {formatMoney(d.sisa || d.total)}
+                    {formatMoney(d.sisa ?? d.total)}
                   </td>
                   <td className="px-8 py-6 text-[13px] text-gray-400">{d.interest}%</td>
                   <td className="px-8 py-6 text-[13px] text-gray-400">

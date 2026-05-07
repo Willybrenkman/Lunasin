@@ -45,9 +45,10 @@ export default function LaporanPage() {
 
   // Compute stats from real data
   const totalHutang = debts.reduce((s, d) => s + Number(d.total || 0), 0);
-  const sisaHutang = debts.reduce((s, d) => s + Number(d.sisa || d.total || 0), 0);
-  const totalTerbayar = totalHutang - sisaHutang;
-  const penurunanPct = totalHutang > 0 ? ((totalTerbayar / totalHutang) * 100).toFixed(1) : 0;
+  const sisaHutang = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
+  const totalTerbayar = Math.max(0, totalHutang - sisaHutang);
+  const penurunanPctRaw = totalHutang > 0 ? (totalTerbayar / totalHutang) * 100 : 0;
+  const penurunanPct = Math.max(0, Math.min(100, penurunanPctRaw)).toFixed(1);
   const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = totalMinPayment > 0 ? Math.ceil(sisaHutang / totalMinPayment) : 0;
   const avgInterest = debts.length > 0 ? debts.reduce((s, d) => s + Number(d.interest || 0), 0) / debts.length : 0;
