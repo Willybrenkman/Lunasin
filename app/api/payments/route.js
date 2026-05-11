@@ -26,18 +26,7 @@ export async function POST(req) {
 
     if (paymentError) throw paymentError;
 
-    // 2. Otomatis potong sisa hutang (Auto-Deduct)
-    const { data: debt } = await supabase.from("debts").select("sisa, total").eq("id", debt_id).single();
-    
-    if (debt) {
-      const currentSisa = Number(debt.sisa ?? debt.total ?? 0);
-      const newSisa = Math.max(0, currentSisa - Number(amount));
-      
-      await supabase.from("debts").update({ 
-        sisa: newSisa,
-        status: newSisa <= 0 ? 'paid_off' : 'active'
-      }).eq("id", debt_id);
-    }
+    // Sisa hutang dipotong otomatis oleh trigger `on_payment_created` di database.
 
     return NextResponse.json({ success: true, data: payment });
   } catch (error) {

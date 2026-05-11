@@ -5,8 +5,8 @@ import { calculatePlan } from "@/lib/calculate";
 import DebtChart from "@/components/DebtChart";
 import {
   Wallet, TrendingUp, Calendar, Plus,
-  Pencil, ChevronRight, BarChart3, Crown,
-  Brain, Trophy, FileText, Share2, Target
+  Pencil, BarChart3, Crown,
+  Brain, Trophy, FileText, Share2
 } from "lucide-react";
 import Link from "next/link";
 import { generateInsight } from "@/lib/insight";
@@ -26,63 +26,52 @@ export default function Dashboard() {
   const [achievements, setAchievements] = useState([]);
   const { formatMoney } = usePrivacy();
 
+  // Fetch data sekali saat mount
   useEffect(() => {
     async function fetchData() {
-      // 1. Cek cache lokal untuk loading instan
       const cached = sessionStorage.getItem("debts_cache");
       if (cached) {
-        const parsed = JSON.parse(cached);
-        setDebts(parsed);
+        setDebts(JSON.parse(cached));
         setLoading(false);
-        updateDashboardState(parsed);
       }
-
       try {
-        // 2. Fetch data terbaru di background
         const response = await fetch("/api/debts");
         const result = await response.json();
         const data = result.data || [];
-        
         setDebts(data);
         sessionStorage.setItem("debts_cache", JSON.stringify(data));
-        updateDashboardState(data);
       } catch (e) {
         console.error(e);
       } finally {
         if (!cached) setLoading(false);
       }
     }
-
-    function updateDashboardState(data) {
-      if (data.length > 0) {
-        const plan = calculatePlan(data, "snowball", extraPayment);
-        setChartData(plan);
-          
-          // Calculate premium features
-          setInsight(generateInsight({ months: plan.length, totalInterest: plan.reduce((s, p) => s + p.total, 0) }));
-          setRecommendationMsg(recommend(data));
-          
-          // Calculate achievements dynamically
-          const totalAwal = data.reduce((s, d) => s + Number(d.total || 0), 0);
-          const totalSisa = data.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
-          const progressRaw = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
-          const progress = Math.max(0, Math.min(100, progressRaw)); // Clamp between 0-100
-          
-          // Strict check for paid off debts: either status is paid_off, or sisa is strictly <= 0 and total > 0
-          const paidOff = data.filter(d => {
-            const isPaidStatus = d.status === 'paid_off';
-            const isSisaZero = d.sisa !== null && d.sisa !== undefined && Number(d.sisa) <= 0 && Number(d.total) > 0;
-            return isPaidStatus || isSisaZero;
-          }).length;
-
-          setAchievements(getAchievements({ paidOff, progress }));
-        } else {
-          // Default empty state
-          setAchievements(getAchievements({ paidOff: 0, progress: 0 }));
-        }
-    }
     fetchData();
-  }, [extraPayment]);
+  }, []);
+
+  // Hitung ulang chart setiap kali debts, strategy, atau extraPayment berubah
+  useEffect(() => {
+    if (debts.length > 0) {
+      const strategyKey = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
+      const plan = calculatePlan(debts, strategyKey, extraPayment);
+      setChartData(plan);
+      setInsight(generateInsight({ months: plan.length, totalInterest: plan.reduce((s, p) => s + p.total, 0) }));
+      setRecommendationMsg(recommend(debts));
+
+      const totalAwal = debts.reduce((s, d) => s + Number(d.total || 0), 0);
+      const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
+      const progressRaw = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
+      const progress = Math.max(0, Math.min(100, progressRaw));
+      const paidOff = debts.filter(d => {
+        const isPaidStatus = d.status === 'paid_off';
+        const isSisaZero = d.sisa !== null && d.sisa !== undefined && Number(d.sisa) <= 0 && Number(d.total) > 0;
+        return isPaidStatus || isSisaZero;
+      }).length;
+      setAchievements(getAchievements({ paidOff, progress }));
+    } else {
+      setAchievements(getAchievements({ paidOff: 0, progress: 0 }));
+    }
+  }, [strategy, debts, extraPayment]);
 
   if (loading) return null;
 

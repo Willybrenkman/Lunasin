@@ -35,7 +35,9 @@ CREATE TABLE IF NOT EXISTS public.debts (
   sisa BIGINT NOT NULL DEFAULT 0,              -- Sisa hutang saat ini
   interest NUMERIC(5,2) NOT NULL DEFAULT 0,    -- Bunga per tahun (%)
   min_payment BIGINT NOT NULL DEFAULT 0,       -- Cicilan minimum / bulan
-  jatuh_tempo DATE,                            -- Tanggal jatuh tempo berikutnya
+  tanggal_mulai DATE,                           -- Tanggal mulai hutang
+  jatuh_tempo DATE,                            -- Target tanggal lunas
+  tanggal_tagihan SMALLINT CHECK (tanggal_tagihan BETWEEN 1 AND 31), -- Tgl cicilan bulanan (1-31)
   status TEXT NOT NULL DEFAULT 'active'        -- 'active' | 'paid_off'
     CHECK (status IN ('active', 'paid_off')),
   notes TEXT,                                  -- Catatan opsional

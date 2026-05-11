@@ -1,13 +1,10 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
 
-export async function GET(req) {
+export async function GET() {
   const supabase = await createSupabaseServerClient();
 
   try {
-    // Ambil user dari header Authorization jika ada
-    const authHeader = req.headers.get('authorization');
-    
     const { data, error } = await supabase
       .from("debts")
       .select("*")

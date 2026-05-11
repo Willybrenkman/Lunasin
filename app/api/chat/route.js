@@ -1,20 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 // ============================================================
 // LUNASIN AI ENGINE — Rule-Based Financial Advisor
 // Menganalisis data hutang user dan memberikan saran spesifik
-// Bisa di-upgrade ke Claude/OpenAI nanti
 // ============================================================
-
-function getSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key || url.includes("YOUR_")) return null;
-  return createClient(url, key);
-}
-
-// Tidak ada data dummy — hanya analisis data asli user
 
 function formatRp(num) {
   return `Rp ${Number(num).toLocaleString("id-ID")}`;
@@ -94,11 +84,15 @@ export async function POST(req) {
   try {
     const { message } = await req.json();
 
-    // Coba ambil data hutang dari Supabase
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
     let debts = [];
-    const supabase = getSupabase();
-    if (supabase) {
-      const { data } = await supabase.from("debts").select("*");
+    if (user) {
+      const { data } = await supabase
+        .from("debts")
+        .select("*")
+        .eq("user_id", user.id);
       if (data && data.length > 0) debts = data;
     }
 
