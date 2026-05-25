@@ -41,8 +41,14 @@ export default function AddDebt() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg("");
+
+    if (form.tanggal_mulai && form.jatuh_tempo && new Date(form.tanggal_mulai) >= new Date(form.jatuh_tempo)) {
+      setErrorMsg("Tanggal mulai harus sebelum target lunas.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const response = await fetch("/api/debts", {
         method: "POST",

@@ -19,7 +19,7 @@ import { usePrivacy } from "@/components/privacy/PrivacyContext";
 export default function Dashboard() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [extraPayment, setExtraPayment] = useState(500000);
+  const [extraPayment] = useState(500000);
   const [chartData, setChartData] = useState([]);
   const [strategy, setStrategy] = useState("Smart Priority");
   const [insight, setInsight] = useState("");
@@ -37,6 +37,7 @@ export default function Dashboard() {
       }
       try {
         const response = await fetch("/api/debts");
+        if (!response.ok) throw new Error("API error");
         const result = await response.json();
         const data = result.data || [];
         setDebts(data);

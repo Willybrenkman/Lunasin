@@ -56,10 +56,18 @@ export default function AIPage() {
   };
 
   // Simple markdown-like formatting
+  const escapeHtml = (str) => str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
   const formatText = (text) => {
     return text.split('\n').map((line, i) => {
+      // Escape HTML entities first to prevent XSS
+      let formatted = escapeHtml(line);
       // Bold
-      let formatted = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
+      formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
       // Bullet points
       if (formatted.startsWith('•') || formatted.startsWith('-')) {
         formatted = `<span class="text-gold mr-1">▸</span>${formatted.substring(1)}`;

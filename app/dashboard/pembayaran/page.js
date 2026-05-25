@@ -94,6 +94,12 @@ export default function Pembayaran() {
     e.preventDefault();
     if (!form.debt_id || !form.amount) return;
     
+    if (Number(form.amount) <= 0) {
+      setErrorMsg("Jumlah pembayaran harus lebih dari 0.");
+      setTimeout(() => setErrorMsg(""), 3500);
+      return;
+    }
+
     setIsSaving(true);
     try {
       const res = await fetch("/api/payments", {

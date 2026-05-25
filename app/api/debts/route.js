@@ -34,6 +34,11 @@ export async function POST(req) {
     const body = await req.json();
     const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes } = body;
 
+    if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
+    if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
+    if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
+    if (Number(interest) < 0 || Number(interest) > 200) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
+
     const { data, error } = await supabase
       .from("debts")
       .insert([
@@ -66,6 +71,11 @@ export async function PUT(req) {
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
+    if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
+    if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
+    if (Number(interest) < 0 || Number(interest) > 200) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
 
     const updateData = {
       name,

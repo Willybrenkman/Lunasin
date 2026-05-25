@@ -27,6 +27,7 @@ export default function SimulasiPage() {
       
       try {
         const response = await fetch("/api/debts");
+        if (!response.ok) throw new Error("API error");
         const result = await response.json();
         setDebts(result.data || []);
         sessionStorage.setItem("debts_cache", JSON.stringify(result.data || []));
