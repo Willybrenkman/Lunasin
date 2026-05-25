@@ -128,7 +128,8 @@ export default function DebtChart({ data, strategy = "Smart Priority", onStrateg
               strokeWidth={3}
               dot={false}
               activeDot={{ r: 6, strokeWidth: 0, fill: '#22C55E' }}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              connectNulls={false}
             />
             <Line
               type="monotone"
@@ -137,7 +138,8 @@ export default function DebtChart({ data, strategy = "Smart Priority", onStrateg
               strokeWidth={2}
               strokeDasharray="6 6"
               dot={false}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              connectNulls={false}
             />
           </LineChart>
         </ResponsiveContainer>
