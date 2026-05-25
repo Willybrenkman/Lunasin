@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Clock, ArrowUpRight, Download, Loader2, Plus, X, Save, Wallet } from "lucide-react";
+import { CheckCircle2, ArrowUpRight, Download, Loader2, X, Save, Wallet, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 import confetti from "canvas-confetti";
@@ -17,6 +17,7 @@ export default function Pembayaran() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState({
     debt_id: "",
     amount: "",
@@ -46,7 +47,7 @@ export default function Pembayaran() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) { setLoading(false); return; }
 
       // Ambil riwayat pembayaran dari Supabase
       const { data: payData, error: payError } = await supabase
@@ -66,8 +67,7 @@ export default function Pembayaran() {
       const { data: debtData } = await supabase
         .from("debts")
         .select("id, name, sisa, total")
-        .eq("user_id", user.id)
-        .eq("status", "active");
+        .eq("user_id", user.id);
         
       if (debtData) {
         setDebts(debtData);
@@ -130,6 +130,8 @@ export default function Pembayaran() {
       }
     } catch (error) {
       console.error(error);
+      setErrorMsg("Gagal menyimpan pembayaran. Coba lagi.");
+      setTimeout(() => setErrorMsg(""), 4000);
     } finally {
       setIsSaving(false);
     }
@@ -155,6 +157,14 @@ export default function Pembayaran() {
           <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(34,197,94,0.15)] backdrop-blur-md">
             <CheckCircle2 size={24} />
             <span className="font-black text-sm tracking-wide">{successMsg}</span>
+          </div>
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(239,68,68,0.15)] backdrop-blur-md">
+            <AlertCircle size={24} />
+            <span className="font-black text-sm tracking-wide">{errorMsg}</span>
           </div>
         </div>
       )}

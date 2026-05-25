@@ -11,6 +11,7 @@ export default function PengingatPage() {
   const [waNotif, setWaNotif] = useState(true);
   const [reminderDays, setReminderDays] = useState("3 hari sebelum jatuh tempo");
   const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
   const [debts, setDebts] = useState([]);
   const [userEmail, setUserEmail] = useState("");
 
@@ -74,6 +75,12 @@ export default function PengingatPage() {
     };
   }).sort((a, b) => a.diffDays - b.diffDays); // Sort by closest due date
 
+  const handleSave = () => {
+    localStorage.setItem("pengingat_settings", JSON.stringify({ enabled, reminderDays, emailNotif, waNotif }));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
       <Loader2 className="animate-spin text-gold" size={40} />
@@ -134,8 +141,11 @@ export default function PengingatPage() {
             />
           </div>
 
-          <button className="w-full bg-[#D4AF37] text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
-            Simpan Perubahan
+          <button
+            onClick={handleSave}
+            className="w-full bg-[#D4AF37] text-black font-black py-3.5 rounded-xl text-xs uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all"
+          >
+            {saved ? "✓ Tersimpan!" : "Simpan Perubahan"}
           </button>
         </div>
 

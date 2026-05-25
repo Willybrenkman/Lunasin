@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Download, TrendingDown, Wallet, Calendar, ChevronRight, Loader2 } from "lucide-react";
+import { TrendingDown, Wallet, Calendar, ChevronRight, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
@@ -83,9 +83,10 @@ export default function LaporanPage() {
     return Object.values(grouped).slice(-6); // Last 6 months
   })();
 
-  // Health score based on real data
-  const dtiRatio = totalMinPayment > 0 ? Math.min(100, Math.round((totalTerbayar / totalHutang) * 100)) : 0;
-  const healthScore = Math.min(100, Math.max(0, dtiRatio + (debts.length > 0 ? 20 : 0) + (payments.length > 0 ? 15 : 0)));
+  // Health score: progress paid off (0-70pt) + activity bonus (0-30pt)
+  const progressScore = debts.length === 0 ? 70 : (totalHutang > 0 ? Math.round((totalTerbayar / totalHutang) * 70) : 0);
+  const activityScore = payments.length >= 3 ? 30 : payments.length > 0 ? 15 : 0;
+  const healthScore = Math.min(100, progressScore + activityScore);
 
   const getHealthLabel = (score) => {
     if (score >= 80) return { label: "Sehat", color: "text-[#22C55E]" };
@@ -147,7 +148,7 @@ export default function LaporanPage() {
                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#94A3B8', fontSize: 10, fontWeight: 900}} tickFormatter={(v) => `${v/1000000}jt`} />
                     <Tooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} contentStyle={{backgroundColor: '#0F1319', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)'}} formatter={(v) => formatMoney(v)} />
                     <Bar dataKey="amount" radius={[6, 6, 0, 0]}>
-                      {chartData.map((entry, index) => (
+                      {chartData.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#D4AF37' : '#1E293B'} />
                       ))}
                     </Bar>
