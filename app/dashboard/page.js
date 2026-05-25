@@ -19,7 +19,9 @@ import { usePrivacy } from "@/components/privacy/PrivacyContext";
 export default function Dashboard() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [extraPayment] = useState(500000);
+  const [extraPayment, setExtraPayment] = useState(500000);
+  const [extraPaymentInput, setExtraPaymentInput] = useState("500000");
+  const [editingExtra, setEditingExtra] = useState(false);
   const [chartData, setChartData] = useState([]);
   const [strategy, setStrategy] = useState("Smart Priority");
   const [insight, setInsight] = useState("");
@@ -181,20 +183,37 @@ export default function Dashboard() {
                  </p>
               </div>
 
-              <button className="text-[11px] font-black text-gold uppercase tracking-widest hover:underline mb-6">
+              <Link href="/dashboard/simulasi" className="text-[11px] font-black text-gold uppercase tracking-widest hover:underline mb-6 block">
                 Lihat Rencana Lengkap →
-              </button>
+              </Link>
             </div>
 
             <div className="space-y-4 mt-auto">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Extra Payment / bulan</label>
-                <div className="flex items-center justify-between bg-black/40 border border-white/5 rounded-2xl p-4">
-                  <p className="font-black text-white text-lg">{formatMoney(extraPayment)}</p>
-                  <Pencil size={16} className="text-gray-500 cursor-pointer hover:text-white transition-colors" />
-                </div>
+                {editingExtra ? (
+                  <input
+                    type="number"
+                    value={extraPaymentInput}
+                    onChange={(e) => setExtraPaymentInput(e.target.value)}
+                    onBlur={() => setEditingExtra(false)}
+                    autoFocus
+                    className="w-full bg-black/40 border border-gold rounded-2xl py-3 px-4 text-white font-black outline-none"
+                  />
+                ) : (
+                  <div
+                    onClick={() => setEditingExtra(true)}
+                    className="flex items-center justify-between bg-black/40 border border-white/5 rounded-2xl p-4 cursor-pointer hover:border-white/20 transition-colors"
+                  >
+                    <p className="font-black text-white text-lg">{formatMoney(extraPayment)}</p>
+                    <Pencil size={16} className="text-gray-500 hover:text-white transition-colors" />
+                  </div>
+                )}
               </div>
-              <button className="w-full bg-[#D4AF37] text-black font-black py-4 rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:brightness-110 active:scale-95 transition-all text-xs uppercase tracking-widest">
+              <button
+                onClick={() => { setExtraPayment(Number(extraPaymentInput) || 0); setEditingExtra(false); }}
+                className="w-full bg-[#D4AF37] text-black font-black py-4 rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:brightness-110 active:scale-95 transition-all text-xs uppercase tracking-widest"
+              >
                 Jalankan Simulasi
               </button>
               <Link href="/dashboard/simulasi" className="block text-center text-[10px] font-black text-gray-500 uppercase tracking-widest hover:text-white transition-colors pt-2">

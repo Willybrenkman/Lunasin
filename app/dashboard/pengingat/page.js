@@ -8,12 +8,23 @@ import Link from "next/link";
 export default function PengingatPage() {
   const [enabled, setEnabled] = useState(true);
   const [emailNotif, setEmailNotif] = useState(true);
-  const [waNotif, setWaNotif] = useState(true);
   const [reminderDays, setReminderDays] = useState("3 hari sebelum jatuh tempo");
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [debts, setDebts] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("pengingat_settings");
+    if (saved) {
+      try {
+        const s = JSON.parse(saved);
+        if (s.enabled !== undefined) setEnabled(s.enabled);
+        if (s.reminderDays) setReminderDays(s.reminderDays);
+        if (s.emailNotif !== undefined) setEmailNotif(s.emailNotif);
+      } catch {}
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -42,7 +53,7 @@ export default function PengingatPage() {
 
   // Compute upcoming debts from real data based on monthly schedule (tanggal_tagihan)
   const today = new Date();
-  // Clamp hari ke hari terakhir bulan (cegah overflow: 31 Feb → 3 Mar)
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const clampDay = (year, month, day) => {
     const lastDay = new Date(year, month + 1, 0).getDate();
     return new Date(year, month, Math.min(day, lastDay));
@@ -51,7 +62,7 @@ export default function PengingatPage() {
   const upcomingDebts = debts.filter(d => d.tanggal_tagihan).map(d => {
     let dueDate = clampDay(today.getFullYear(), today.getMonth(), d.tanggal_tagihan);
 
-    if (dueDate.getDate() < today.getDate()) {
+    if (dueDate < todayStart) {
       dueDate = clampDay(today.getFullYear(), today.getMonth() + 1, d.tanggal_tagihan);
     }
 
@@ -80,7 +91,7 @@ export default function PengingatPage() {
   }).sort((a, b) => a.diffDays - b.diffDays); // Sort by closest due date
 
   const handleSave = () => {
-    localStorage.setItem("pengingat_settings", JSON.stringify({ enabled, reminderDays, emailNotif, waNotif }));
+    localStorage.setItem("pengingat_settings", JSON.stringify({ enabled, reminderDays, emailNotif }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -136,13 +147,14 @@ export default function PengingatPage() {
               onChange={setEmailNotif}
             />
 
-            <CheckboxRow
-              icon={<MessageCircle size={18} />}
-              label="WhatsApp"
-              sub="Segera hadir"
-              checked={waNotif}
-              onChange={setWaNotif}
-            />
+            <div className="flex items-center gap-4 p-4 bg-black/20 border border-white/5 rounded-2xl opacity-50 cursor-not-allowed select-none">
+              <div className="w-5 h-5 rounded border-2 border-white/20 flex items-center justify-center" />
+              <div className="text-gray-400"><MessageCircle size={18} /></div>
+              <div className="flex-1">
+                <p className="font-bold text-sm text-white">WhatsApp</p>
+                <p className="text-[11px] text-gray-500 font-medium mt-0.5">Segera hadir</p>
+              </div>
+            </div>
           </div>
 
           <button

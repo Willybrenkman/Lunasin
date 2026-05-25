@@ -69,9 +69,9 @@ export default function DemoPage() {
               <BarChart3 size={20} /> Dashboard
             </div>
             {["Hutang Saya", "Simulasi", "Pembayaran", "Laporan", "Pengingat", "Konsultan AI", "Bonus Premium"].map((item) => (
-              <div key={item} className="flex items-center gap-4 p-3 rounded-xl text-gray-500 font-bold text-[13px] select-none pointer-events-none blur-[1.5px]">
+              <Link key={item} href="/login" className="flex items-center gap-4 p-3 rounded-xl text-gray-500 font-bold text-[13px] blur-[1.5px] hover:blur-[2px] transition-all">
                 <span className="w-4 h-4 rounded bg-white/10 shrink-0" /> {item}
-              </div>
+              </Link>
             ))}
           </nav>
 

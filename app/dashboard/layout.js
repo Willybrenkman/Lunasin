@@ -196,7 +196,6 @@ export default function DashboardLayout({ children }) {
                 title="Notifikasi & Pengingat"
               >
                 <Bell size={22} />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#06080C]"></span>
               </button>
             </div>
 

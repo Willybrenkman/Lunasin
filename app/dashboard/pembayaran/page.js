@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, ArrowUpRight, Download, Loader2, X, Save, Wallet, AlertCircle } from "lucide-react";
+import { CheckCircle2, ArrowUpRight, Loader2, X, Save, Wallet, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 import confetti from "canvas-confetti";
@@ -77,7 +77,7 @@ export default function Pembayaran() {
     } catch (e) {
       console.error(e);
     } finally {
-      if (!cachedPayments || !cachedDebts) setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -96,6 +96,14 @@ export default function Pembayaran() {
     
     if (Number(form.amount) <= 0) {
       setErrorMsg("Jumlah pembayaran harus lebih dari 0.");
+      setTimeout(() => setErrorMsg(""), 3500);
+      return;
+    }
+
+    const selectedDebt = debts.find(d => d.id === form.debt_id);
+    const sisaDebt = Number(selectedDebt?.sisa ?? selectedDebt?.total ?? 0);
+    if (sisaDebt > 0 && Number(form.amount) > sisaDebt) {
+      setErrorMsg(`Jumlah melebihi sisa hutang (${formatMoney(sisaDebt)}).`);
       setTimeout(() => setErrorMsg(""), 3500);
       return;
     }
@@ -208,9 +216,7 @@ export default function Pembayaran() {
       <div className="bg-[#0F1319] rounded-3xl border border-white/5 overflow-hidden">
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <h3 className="font-black text-lg text-white">Riwayat Transaksi</h3>
-          <button className="text-[10px] font-black text-gray-500 flex items-center gap-2 hover:text-white transition-colors uppercase tracking-widest">
-            <Download size={16} /> Export CSV
-          </button>
+          <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Riwayat Terakhir (20)</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -280,7 +286,7 @@ export default function Pembayaran() {
                   required
                 >
                   <option value="" disabled>-- Pilih Hutang Yang Dibayar --</option>
-                  {debts.map(d => (
+                  {debts.filter(d => Number(d.sisa ?? d.total ?? 0) > 0).map(d => (
                     <option key={d.id} value={d.id}>
                       {d.name} (Sisa: {formatMoney(d.sisa ?? d.total)})
                     </option>

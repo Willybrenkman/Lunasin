@@ -8,6 +8,7 @@ import { usePrivacy } from "@/components/privacy/PrivacyContext";
 export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const { formatMoney } = usePrivacy();
@@ -154,6 +155,8 @@ export default function DebtsPage() {
           <input
             type="text"
             placeholder="Cari nama hutang..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-2xl py-3 pl-12 pr-4 outline-none focus:border-gold transition-colors text-white placeholder:text-gray-500"
           />
         </div>
@@ -186,14 +189,17 @@ export default function DebtsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {debts.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-8 py-16 text-center">
-                    <p className="text-gray-500 font-bold text-sm mb-2">Belum ada data hutang</p>
-                    <p className="text-gray-600 text-xs">Klik tombol "Tambah Hutang" untuk mulai mencatat hutangmu.</p>
-                  </td>
-                </tr>
-              ) : debts.map((d) => (
+              {(() => {
+                const filtered = debts.filter(d => (d.name || "").toLowerCase().includes(searchQuery.toLowerCase()));
+                if (filtered.length === 0) return (
+                  <tr>
+                    <td colSpan={8} className="px-8 py-16 text-center">
+                      <p className="text-gray-500 font-bold text-sm mb-2">{searchQuery ? "Tidak ada hutang yang cocok" : "Belum ada data hutang"}</p>
+                      <p className="text-gray-600 text-xs">{searchQuery ? `Coba kata kunci lain.` : `Klik tombol "Tambah Hutang" untuk mulai mencatat hutangmu.`}</p>
+                    </td>
+                  </tr>
+                );
+                return filtered.map((d) => (
                 <tr
                   key={d.id}
                   className="hover:bg-white/[0.02] transition-all group"
@@ -219,9 +225,9 @@ export default function DebtsPage() {
                   </td>
                   <td className="px-8 py-6 text-center">
                     <span className={`inline-block px-3 py-1 text-[9px] font-black rounded-md uppercase tracking-widest border ${
-                      d.status === 'paid_off' 
-                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                        : "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"
+                      d.status === 'paid_off'
+                        ? "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20"
+                        : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
                     }`}>
                       {d.status === 'paid_off' ? "Lunas" : "Aktif"}
                     </span>
@@ -245,7 +251,8 @@ export default function DebtsPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ));
+              })()}
             </tbody>
           </table>
         </div>

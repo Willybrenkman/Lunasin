@@ -5,6 +5,7 @@ import { TrendingDown, Wallet, Calendar, ChevronRight, Loader2 } from "lucide-re
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
+import { simulate } from "@/lib/calculate";
 
 export default function LaporanPage() {
   const [activeTab, setActiveTab] = useState("Ringkasan");
@@ -62,10 +63,11 @@ export default function LaporanPage() {
   const totalTerbayar = Math.max(0, totalHutang - sisaHutang);
   const penurunanPctRaw = totalHutang > 0 ? (totalTerbayar / totalHutang) * 100 : 0;
   const penurunanPct = Math.max(0, Math.min(100, penurunanPctRaw)).toFixed(1);
-  const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
-  const estimasiBulan = totalMinPayment > 0 ? Math.ceil(sisaHutang / totalMinPayment) : 0;
+  const totalMinPayment = debts.filter(d => Number(d.sisa ?? d.total ?? 0) > 0).reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const avgInterest = debts.length > 0 ? debts.reduce((s, d) => s + Number(d.interest || 0), 0) / debts.length : 0;
-  const estTotalBunga = Math.round(sisaHutang * (avgInterest / 100 / 12) * estimasiBulan);
+  const simResult = debts.length > 0 ? simulate(debts, "smart priority", 0) : { months: 0, totalInterest: 0 };
+  const estimasiBulan = simResult.months;
+  const estTotalBunga = simResult.totalInterest;
   const totalPaid = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
 
   // Build chart data from payments grouped by month
@@ -122,7 +124,51 @@ export default function LaporanPage() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      {(activeTab === "Timeline" || activeTab === "PDF / Export") && (
+        <div className="h-[40vh] flex flex-col items-center justify-center text-center luxury-card rounded-[2rem]">
+          <p className="text-4xl mb-4">🚧</p>
+          <p className="text-white font-black text-lg mb-2">Segera Hadir</p>
+          <p className="text-gray-500 text-sm">Fitur <span className="text-gold font-bold">{activeTab}</span> sedang dalam pengembangan.</p>
+        </div>
+      )}
+
+      {activeTab === "Pembayaran" && (
+        <div className="luxury-card rounded-[2rem] overflow-hidden">
+          <div className="p-6 border-b border-white/5">
+            <h3 className="font-black text-lg text-white">Riwayat Pembayaran</h3>
+          </div>
+          {payments.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-gray-500 font-bold text-sm">Belum ada riwayat pembayaran</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-black/20">
+                  <tr className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                    <th className="px-8 py-4">Tanggal</th>
+                    <th className="px-8 py-4">Hutang</th>
+                    <th className="px-8 py-4">Jumlah</th>
+                    <th className="px-8 py-4">Catatan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {payments.slice().reverse().map((p, i) => (
+                    <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="px-8 py-4 text-sm text-gray-400">{new Date(p.payment_date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</td>
+                      <td className="px-8 py-4 font-bold text-white text-sm">{p.debt_name || p.debts?.name || "-"}</td>
+                      <td className="px-8 py-4 font-black text-[#22C55E] text-sm">{formatMoney(p.amount)}</td>
+                      <td className="px-8 py-4 text-sm text-gray-500">{p.notes || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "Ringkasan" && <div className="grid lg:grid-cols-3 gap-8">
         {/* Left Column: Stats & Chart */}
         <div className="lg:col-span-2 space-y-8">
           <div className="grid md:grid-cols-3 gap-6">
@@ -197,7 +243,7 @@ export default function LaporanPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

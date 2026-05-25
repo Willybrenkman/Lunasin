@@ -29,7 +29,7 @@ export default function DebtCalendar({ debts }) {
                <div className="w-2 h-2 rounded-full bg-gold"></div>
                <span className="font-bold text-sm text-white">{d.name}</span>
             </div>
-            <span className="text-[11px] font-medium text-gray-400 bg-[#06080C] px-3 py-1.5 rounded-lg border border-white/5">{d.due_date || '-'}</span>
+            <span className="text-[11px] font-medium text-gray-400 bg-[#06080C] px-3 py-1.5 rounded-lg border border-white/5">{d.tanggal_tagihan ? `Tgl ${d.tanggal_tagihan}` : '-'}</span>
           </div>
         ))}
       </div>

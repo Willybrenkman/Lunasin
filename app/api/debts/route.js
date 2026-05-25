@@ -68,7 +68,9 @@ export async function PUT(req) {
   try {
     const body = await req.json();
     const { id, name, total, sisa, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, status, notes } = body;
-    
+
+    if (!id) return NextResponse.json({ error: "ID tidak valid." }, { status: 400 });
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -110,7 +112,9 @@ export async function DELETE(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    
+
+    if (!id) return NextResponse.json({ error: "ID tidak valid." }, { status: 400 });
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

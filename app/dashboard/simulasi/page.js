@@ -50,27 +50,44 @@ export default function SimulasiPage() {
 
   // Hitung summary dari data real
   const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
-  const totalMinPayment = debts.reduce((s, d) => s + Number(d.min_payment || 0), 0);
+  const totalMinPayment = debts
+    .filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
+    .reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
 
-  // Hitung what-if analysis dari data real menggunakan fungsi simulasi aktual
   const extraAmounts = [0, 250000, 500000, 1000000, 1500000];
-  
-  const whatIfData = debts.length > 0 ? extraAmounts.map((extra, idx) => {
-    // Jalankan simulasi baseline (0 extra) dan skenario (extra)
-    const baseline = simulate(debts, strategy.toLowerCase(), 0);
-    const sim = simulate(debts, strategy.toLowerCase(), extra);
-    
-    const savings = Math.max(0, baseline.totalInterest - sim.totalInterest);
 
-    return {
-      extra: formatMoney(extra),
-      months: `${sim.months} bulan`,
-      totalInterest: formatMoney(sim.totalInterest),
-      savings: formatMoney(savings),
-      status: idx === 2 ? "Optimal" : "",
-    };
-  }) : [];
+  const whatIfData = (() => {
+    if (debts.length === 0) return [];
+
+    const baseline = simulate(debts, strategy.toLowerCase(), 0);
+
+    const rows = extraAmounts.map((extra) => {
+      const sim = extra === 0 ? baseline : simulate(debts, strategy.toLowerCase(), extra);
+      const rawSavings = Math.max(0, baseline.totalInterest - sim.totalInterest);
+      return { extra, months: sim.months, totalInterest: sim.totalInterest, rawSavings };
+    });
+
+    // Optimal: skenario pertama yang mencapai ≥60% dari max penghematan waktu
+    const maxSaved = rows[0].months - rows[rows.length - 1].months;
+    let optimalIdx = 2;
+    if (maxSaved > 0) {
+      for (let i = 1; i < rows.length; i++) {
+        if (rows[0].months - rows[i].months >= maxSaved * 0.6) {
+          optimalIdx = i;
+          break;
+        }
+      }
+    }
+
+    return rows.map((row, idx) => ({
+      extra: formatMoney(row.extra),
+      months: `${row.months} bulan`,
+      totalInterest: formatMoney(row.totalInterest),
+      savings: formatMoney(row.rawSavings),
+      status: idx === optimalIdx ? "Optimal" : "",
+    }));
+  })();
 
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
@@ -182,7 +199,7 @@ export default function SimulasiPage() {
             </div>
             
             <div className="h-[400px]">
-               <DebtChart data={chartData} />
+               <DebtChart data={chartData} strategy={strategy} onStrategyChange={setStrategy} />
             </div>
           </div>
         </div>
