@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Filter, Loader2, Pencil, Trash2, X, Save, CheckCircle2 } from "lucide-react";
+import { Plus, Search, Filter, Loader2, Pencil, Trash2, X, Save, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 
@@ -9,7 +9,10 @@ export default function DebtsPage() {
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const { formatMoney } = usePrivacy();
+
+  const showError = (msg) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(""), 3500); };
 
   // Edit Modal State
   const [editModal, setEditModal] = useState({ isOpen: false, data: null });
@@ -47,9 +50,12 @@ export default function DebtsPage() {
         sessionStorage.removeItem("debts_cache");
         showSuccess("Hutang berhasil dihapus!");
         setDebts(debts.filter(d => d.id !== id));
+      } else {
+        showError("Gagal menghapus hutang. Coba lagi.");
       }
     } catch (error) {
       console.error(error);
+      showError("Gagal menghapus hutang. Coba lagi.");
     }
   };
 
@@ -97,10 +103,13 @@ export default function DebtsPage() {
         sessionStorage.removeItem("debts_cache");
         showSuccess("Data hutang berhasil diupdate!");
         setEditModal({ isOpen: false, data: null });
-        fetchData(); // Reload data
+        fetchData();
+      } else {
+        showError("Gagal menyimpan perubahan. Coba lagi.");
       }
     } catch (error) {
       console.error(error);
+      showError("Gagal menyimpan perubahan. Coba lagi.");
     } finally {
       setIsSaving(false);
     }
@@ -125,6 +134,14 @@ export default function DebtsPage() {
           <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(34,197,94,0.15)] backdrop-blur-md">
             <CheckCircle2 size={24} />
             <span className="font-black text-sm tracking-wide">{successMsg}</span>
+          </div>
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(239,68,68,0.15)] backdrop-blur-md">
+            <AlertCircle size={24} />
+            <span className="font-black text-sm tracking-wide">{errorMsg}</span>
           </div>
         </div>
       )}

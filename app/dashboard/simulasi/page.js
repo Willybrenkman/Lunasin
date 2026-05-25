@@ -1,8 +1,6 @@
 "use client";
 
-import { 
-  Download, Share2, ArrowLeft, Crown
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import DebtChart from "@/components/DebtChart";
 import { useEffect, useState } from "react";
 import { calculatePlan, simulate } from "@/lib/calculate";
@@ -14,6 +12,7 @@ export default function SimulasiPage() {
   const [strategy, setStrategy] = useState("Smart Priority");
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [extraPaymentInput, setExtraPaymentInput] = useState("500000");
   const [extraPayment, setExtraPayment] = useState(500000);
   const { formatMoney } = usePrivacy();
@@ -33,6 +32,7 @@ export default function SimulasiPage() {
         sessionStorage.setItem("debts_cache", JSON.stringify(result.data || []));
       } catch (e) {
         console.error(e);
+        if (!cached) setFetchError(true);
       } finally {
         if (!cached) setLoading(false);
       }
@@ -74,6 +74,16 @@ export default function SimulasiPage() {
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
       <div className="animate-spin w-10 h-10 border-4 border-gold border-t-transparent rounded-full" />
+    </div>
+  );
+
+  if (fetchError) return (
+    <div className="h-[60vh] flex flex-col items-center justify-center text-center">
+      <p className="text-red-400 font-bold text-lg mb-2">Gagal memuat data</p>
+      <p className="text-gray-600 text-sm mb-6">Periksa koneksi internetmu dan coba lagi.</p>
+      <button onClick={() => window.location.reload()} className="bg-white/10 text-white font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-white/20 transition-all">
+        Coba Lagi
+      </button>
     </div>
   );
 
@@ -221,7 +231,7 @@ export default function SimulasiPage() {
   );
 }
 
-function StrategyOption({ active, onClick, title, desc, pro }) {
+function StrategyOption({ active, onClick, title, desc }) {
   return (
     <div 
       onClick={onClick}

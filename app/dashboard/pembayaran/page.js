@@ -112,7 +112,7 @@ export default function Pembayaran() {
         setIsModalOpen(false);
         setForm({ debt_id: "", amount: "", payment_date: new Date().toISOString().split('T')[0], notes: "" });
 
-        if (amountPaid >= sisaSebelumnya) {
+        if (debtPaid && amountPaid >= sisaSebelumnya && sisaSebelumnya > 0) {
           // LUNAS! Fire Confetti!
           confetti({
             particleCount: 150,
