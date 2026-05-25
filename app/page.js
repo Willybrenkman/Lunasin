@@ -55,7 +55,7 @@ function Navbar() {
         </Link>
         <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
           <button className="bg-[#D4AF37] text-black px-5 py-2.5 rounded-xl text-[13px] font-black shadow-lg shadow-gold/20 hover:brightness-110 transition-all">
-            Daftar Gratis
+            Daftar Sekarang
           </button>
         </a>
       </div>
@@ -88,9 +88,14 @@ function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
               <button className="w-full sm:w-auto bg-[#D4AF37] text-black px-10 py-4 rounded-2xl text-base font-black shadow-2xl shadow-gold/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
-                Mulai Gratis Sekarang <ArrowRight size={18} />
+                Mulai Sekarang <ArrowRight size={18} />
               </button>
             </a>
+            <Link href="/demo">
+              <button className="w-full sm:w-auto px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-black hover:bg-white/10 transition-colors text-base">
+                Lihat Demo
+              </button>
+            </Link>
             <Link href="/login">
               <button className="w-full sm:w-auto px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-black hover:bg-white/10 transition-colors text-base">
                 Sudah Punya Akun
@@ -101,7 +106,7 @@ function Hero() {
           <div className="flex flex-wrap justify-center gap-6 pt-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Setup 2 menit</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Data aman & terenkripsi</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Tanpa biaya tersembunyi</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Bayar sekali, akses selamanya</span>
           </div>
         </motion.div>
 
@@ -425,7 +430,7 @@ function FinalCTA() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
                 <button className="w-full sm:w-auto bg-gold text-black px-10 py-4 rounded-2xl font-black text-base hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-gold/30 flex items-center justify-center gap-2">
-                  Daftar Gratis via WhatsApp <ChevronRight size={18} />
+                  Daftar via WhatsApp <ChevronRight size={18} />
                 </button>
               </a>
             </div>
