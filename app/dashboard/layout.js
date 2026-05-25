@@ -18,10 +18,22 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const { isPrivate, togglePrivacy } = usePrivacy();
   const [profile, setProfile] = useState({ display_name: "User", is_pro: false, email: "" });
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
+
+  // Halaman yang hanya bisa diakses user PRO
+  const proOnlyPaths = [
+    "/dashboard/pembayaran",
+    "/dashboard/laporan",
+    "/dashboard/bonus",
+    "/dashboard/ai",
+    "/dashboard/pengingat",
+  ];
+  const isProPage = proOnlyPaths.some(p => pathname.startsWith(p));
+  const isLocked = profileLoaded && !profile.is_pro && isProPage;
 
   useEffect(() => {
     async function loadProfile() {
@@ -52,6 +64,8 @@ export default function DashboardLayout({ children }) {
           }
         }
       } catch {
+      } finally {
+        setProfileLoaded(true);
       }
     }
     loadProfile();
@@ -298,8 +312,12 @@ export default function DashboardLayout({ children }) {
         )}
 
         <div className="p-6 lg:p-12 flex-1 max-w-[1600px] mx-auto w-full">
-          <ProLock isLocked={false}>
-            {children}
+          <ProLock isLocked={isLocked}>
+            {!profileLoaded && isProPage ? (
+              <div className="h-[60vh] flex items-center justify-center">
+                <div className="animate-spin w-10 h-10 border-4 border-gold border-t-transparent rounded-full" />
+              </div>
+            ) : children}
           </ProLock>
         </div>
       </main>
