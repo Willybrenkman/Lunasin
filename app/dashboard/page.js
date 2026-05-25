@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { calculatePlan } from "@/lib/calculate";
-import DebtChart from "@/components/DebtChart";
+const DebtChart = dynamic(() => import("@/components/DebtChart"), { ssr: false });
 import {
   Wallet, TrendingUp, Calendar, Plus,
   Pencil, BarChart3, Crown,
@@ -41,9 +42,9 @@ export default function Dashboard() {
         setDebts(data);
         sessionStorage.setItem("debts_cache", JSON.stringify(data));
       } catch (e) {
-        console.error(e);
+        // Network error — tetap tampilkan data dari cache jika ada
       } finally {
-        if (!cached) setLoading(false);
+        setLoading(false);
       }
     }
     fetchData();
@@ -73,13 +74,48 @@ export default function Dashboard() {
     }
   }, [strategy, debts, extraPayment]);
 
-  if (loading) return null;
+  if (loading) return (
+    <div className="space-y-8 animate-pulse">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="luxury-card rounded-3xl p-6 h-[120px]">
+            <div className="h-3 w-24 bg-white/10 rounded mb-4" />
+            <div className="h-7 w-32 bg-white/10 rounded mb-2" />
+            <div className="h-2 w-20 bg-white/5 rounded" />
+          </div>
+        ))}
+      </div>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 luxury-card rounded-[2rem] h-[340px]" />
+        <div className="luxury-card rounded-[2rem] h-[340px]" />
+      </div>
+    </div>
+  );
 
   // Compute summary stats from actual data
   const totalHutang = debts.reduce((s, d) => s + Number(d.total || 0), 0);
   const sisaHutang = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
   const progressPctRaw = totalHutang > 0 ? Math.round(((totalHutang - sisaHutang) / totalHutang) * 100) : 0;
   const progressPct = Math.max(0, Math.min(100, progressPctRaw)); // Clamp between 0-100
+
+  if (debts.length === 0) return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-in fade-in duration-700 space-y-6">
+      <div className="w-24 h-24 rounded-3xl bg-gold/10 border border-gold/20 flex items-center justify-center text-5xl">
+        💳
+      </div>
+      <div>
+        <h2 className="text-2xl font-black text-white mb-2">Belum ada hutang tercatat</h2>
+        <p className="text-gray-500 max-w-sm leading-relaxed">
+          Mulai catat hutangmu sekarang dan biarkan Lunasin membantumu melunasinya lebih cepat.
+        </p>
+      </div>
+      <Link href="/dashboard/add">
+        <button className="flex items-center gap-2 bg-[#D4AF37] text-black font-black px-8 py-4 rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] text-sm uppercase tracking-widest">
+          <Plus size={18} /> Tambah Hutang Pertama
+        </button>
+      </Link>
+    </div>
+  );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   Wallet, LayoutDashboard, CreditCard, BarChart3,
   Bell, Settings, LogOut, HelpCircle, Search, FileText,
-  Eye, EyeOff, Gift, BookOpen, X
+  Eye, EyeOff, Gift, BookOpen, X, Menu
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -16,40 +16,44 @@ import ProLock from "@/components/pro/ProLock";
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isPrivate, togglePrivacy, formatMoney } = usePrivacy();
-  const [profile, setProfile] = useState({ display_name: "User", is_pro: true, email: "" });
+  const { isPrivate, togglePrivacy } = usePrivacy();
+  const [profile, setProfile] = useState({ display_name: "User", is_pro: false, email: "" });
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('display_name, is_pro, email')
-          .eq('id', user.id)
-          .single();
-        if (data) {
-          setProfile(data);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('display_name, is_pro, email')
+            .eq('id', user.id)
+            .single();
+          if (data) {
+            setProfile(data);
 
-          // Auto-sync: jika profile belum pro, cek apakah email sudah punya voucher
-          if (!data.is_pro) {
-            const { data: hasVoucher } = await supabase.rpc(
-              'check_email_has_voucher',
-              { p_email: user.email }
-            );
-            if (hasVoucher) {
-              // Update profile ke pro
-              await supabase
-                .from('profiles')
-                .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
-                .eq('id', user.id);
-              setProfile(prev => ({ ...prev, is_pro: true }));
+            if (!data.is_pro) {
+              const { data: hasVoucher } = await supabase.rpc(
+                'check_email_has_voucher',
+                { p_email: user.email }
+              );
+              if (hasVoucher) {
+                await supabase
+                  .from('profiles')
+                  .update({ is_pro: true, pro_activated_at: new Date().toISOString() })
+                  .eq('id', user.id);
+                setProfile(prev => ({ ...prev, is_pro: true }));
+              }
             }
           }
         }
+      } finally {
+        setProfileLoaded(true);
       }
     }
     loadProfile();
@@ -71,7 +75,7 @@ export default function DashboardLayout({ children }) {
     { label: "Laporan", href: "/dashboard/laporan", icon: "📄" },
     { label: "Pengingat", href: "/dashboard/pengingat", icon: "🔔" },
     { label: "Pengaturan", href: "/dashboard/pengaturan", icon: "⚙️" },
-    { label: "Konsultan AI", href: "/dashboard/ai", icon: "✨" },
+    { label: "Asisten Lunasin", href: "/dashboard/ai", icon: "✨" },
     { label: "Bonus Premium", href: "/dashboard/bonus", icon: "🎁" },
     { label: "Panduan Aplikasi", href: "/dashboard/panduan", icon: "📖" },
   ];
@@ -82,6 +86,8 @@ export default function DashboardLayout({ children }) {
 
   const handleLogout = async () => {
     try {
+      sessionStorage.removeItem("debts_cache");
+      sessionStorage.removeItem("payments_cache");
       await supabase.auth.signOut();
     } catch (e) {
       console.error(e);
@@ -122,7 +128,7 @@ export default function DashboardLayout({ children }) {
           <SidebarLink icon={<Settings size={20} />} label="Pengaturan" href="/dashboard/pengaturan" active={pathname === "/dashboard/pengaturan"} />
           
           <div className="my-2 border-t border-white/5"></div>
-          <SidebarLink icon={<span className="text-[#D4AF37]">✨</span>} label="Konsultan AI" href="/dashboard/ai" active={pathname === "/dashboard/ai"} />
+          <SidebarLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunasin" href="/dashboard/ai" active={pathname === "/dashboard/ai"} />
           <SidebarLink icon={<Gift size={20} />} label="Bonus Premium" href="/dashboard/bonus" active={pathname === "/dashboard/bonus"} />
           <SidebarLink icon={<BookOpen size={20} />} label="Panduan Aplikasi" href="/dashboard/panduan" active={pathname === "/dashboard/panduan"} />
         </nav>
@@ -152,12 +158,21 @@ export default function DashboardLayout({ children }) {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden relative">
         {/* Header */}
-        <header className="backdrop-blur-md bg-[#06080C]/80 border-b border-white/5 py-6 px-12 flex justify-between items-center sticky top-0 z-20">
-          <div>
-            <h1 className="text-[26px] font-black tracking-tight text-white capitalize">
-              {pageTitle()}
-            </h1>
-            <p className="text-[13px] text-gray-500 font-bold mt-1">Ringkasan kondisi hutangmu saat ini</p>
+        <header className="backdrop-blur-md bg-[#06080C]/80 border-b border-white/5 py-4 px-6 lg:py-6 lg:px-12 flex justify-between items-center sticky top-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+              aria-label="Buka menu"
+            >
+              <Menu size={22} />
+            </button>
+            <div>
+              <h1 className="text-[20px] lg:text-[26px] font-black tracking-tight text-white capitalize">
+                {pageTitle()}
+              </h1>
+              <p className="text-[11px] lg:text-[13px] text-gray-500 font-bold mt-0.5 hidden sm:block">Ringkasan kondisi hutangmu saat ini</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-6">
@@ -193,7 +208,7 @@ export default function DashboardLayout({ children }) {
                 <p className="text-[10px] text-gold font-black uppercase tracking-widest mt-0.5">{profile.is_pro ? "Pro Member" : "Free Account"}</p>
               </div>
               <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 p-0.5 hover:scale-105 transition-transform cursor-pointer bg-[#0F1319]">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" className="w-full h-full object-cover rounded-[0.5rem]" />
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" loading="lazy" className="w-full h-full object-cover rounded-[0.5rem]" />
               </div>
             </div>
           </div>
@@ -244,8 +259,49 @@ export default function DashboardLayout({ children }) {
           </div>
         )}
 
-        <div className="p-12 flex-1 max-w-[1600px] mx-auto w-full">
-          <ProLock isLocked={!profile.is_pro && !['/dashboard', '/dashboard/simulasi'].includes(pathname)}>
+        {/* Mobile Sidebar Drawer */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+            <aside className="absolute left-0 top-0 h-full w-[280px] bg-[#0A0D12] border-r border-white/5 flex flex-col p-6 shadow-2xl animate-in slide-in-from-left duration-300">
+              <div className="flex items-center justify-between mb-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center">
+                    <Wallet className="text-black" size={18} />
+                  </div>
+                  <span className="text-lg font-black text-white">Lunasin.id</span>
+                </div>
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <nav className="flex flex-col gap-1.5 flex-1">
+                <MobileNavLink icon={<LayoutDashboard size={18} />} label="Dashboard" href="/dashboard" active={pathname === "/dashboard"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<CreditCard size={18} />} label="Hutang Saya" href="/dashboard/debts" active={pathname === "/dashboard/debts"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<BarChart3 size={18} />} label="Simulasi" href="/dashboard/simulasi" active={pathname === "/dashboard/simulasi"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<Wallet size={18} />} label="Pembayaran" href="/dashboard/pembayaran" active={pathname === "/dashboard/pembayaran"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<FileText size={18} />} label="Laporan" href="/dashboard/laporan" active={pathname === "/dashboard/laporan"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<Bell size={18} />} label="Pengingat" href="/dashboard/pengingat" active={pathname === "/dashboard/pengingat"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<Settings size={18} />} label="Pengaturan" href="/dashboard/pengaturan" active={pathname === "/dashboard/pengaturan"} onClick={() => setMobileMenuOpen(false)} />
+                <div className="my-2 border-t border-white/5" />
+                <MobileNavLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunasin" href="/dashboard/ai" active={pathname === "/dashboard/ai"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<Gift size={18} />} label="Bonus Premium" href="/dashboard/bonus" active={pathname === "/dashboard/bonus"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<BookOpen size={18} />} label="Panduan Aplikasi" href="/dashboard/panduan" active={pathname === "/dashboard/panduan"} onClick={() => setMobileMenuOpen(false)} />
+              </nav>
+
+              <div className="border-t border-white/5 pt-4 flex flex-col gap-1">
+                <MobileNavLink icon={<HelpCircle size={18} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20butuh%20bantuan" onClick={() => setMobileMenuOpen(false)} />
+                <button onClick={handleLogout} className="flex items-center gap-3 p-3 rounded-xl font-bold text-sm text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+                  <LogOut size={18} /> Keluar
+                </button>
+              </div>
+            </aside>
+          </div>
+        )}
+
+        <div className="p-6 lg:p-12 flex-1 max-w-[1600px] mx-auto w-full">
+          <ProLock isLocked={profileLoaded && !profile.is_pro && !['/dashboard', '/dashboard/simulasi'].includes(pathname)}>
             {children}
           </ProLock>
         </div>
@@ -261,6 +317,18 @@ function SidebarLink({ icon, label, active, href, target }) {
       ${active
         ? "bg-gold/10 text-gold border-l-4 border-gold pl-3"
         : "text-gray-500 hover:text-white hover:bg-white/5 border-l-4 border-transparent"}
+    `}>
+      <span className={active ? "text-gold" : ""}>{icon}</span>
+      <span>{label}</span>
+    </Link>
+  );
+}
+
+function MobileNavLink({ icon, label, href, active, onClick }) {
+  return (
+    <Link href={href} onClick={onClick} className={`
+      flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm
+      ${active ? "bg-gold/10 text-gold" : "text-gray-500 hover:text-white hover:bg-white/5"}
     `}>
       <span className={active ? "text-gold" : ""}>{icon}</span>
       <span>{label}</span>

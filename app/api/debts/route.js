@@ -5,9 +5,13 @@ export async function GET() {
   const supabase = await createSupabaseServerClient();
 
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const { data, error } = await supabase
       .from("debts")
       .select("*")
+      .eq("user_id", user.id)
       .order('created_at', { ascending: false });
 
     if (error || !data) {
@@ -24,20 +28,20 @@ export async function POST(req) {
   const supabase = await createSupabaseServerClient();
 
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const body = await req.json();
     const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes } = body;
-    
-    // Ambil user yang sedang login
-    const { data: { user } } = await supabase.auth.getUser();
-    
+
     const { data, error } = await supabase
       .from("debts")
       .insert([
         {
-          user_id: user?.id || null,
+          user_id: user.id,
           name,
           total: Number(total),
-          sisa: Number(total), // Sisa awal = total
+          sisa: Number(total),
           interest: Number(interest),
           min_payment: Number(min_payment),
           tanggal_mulai: tanggal_mulai || null,

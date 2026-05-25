@@ -64,6 +64,10 @@ export default function DebtsPage() {
         interest: debt.interest,
         min_payment: debt.min_payment,
         status: debt.status,
+        tanggal_mulai: debt.tanggal_mulai ? debt.tanggal_mulai.slice(0, 10) : "",
+        jatuh_tempo: debt.jatuh_tempo ? debt.jatuh_tempo.slice(0, 10) : "",
+        tanggal_tagihan: debt.tanggal_tagihan ?? "",
+        notes: debt.notes ?? "",
       }
     });
   };
@@ -83,6 +87,10 @@ export default function DebtsPage() {
           interest: Number(editModal.data.interest),
           min_payment: Number(editModal.data.min_payment),
           status: editModal.data.status,
+          tanggal_mulai: editModal.data.tanggal_mulai || null,
+          jatuh_tempo: editModal.data.jatuh_tempo || null,
+          tanggal_tagihan: editModal.data.tanggal_tagihan ? Number(editModal.data.tanggal_tagihan) : null,
+          notes: editModal.data.notes || null,
         })
       });
       if (response.ok) {

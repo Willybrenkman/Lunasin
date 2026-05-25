@@ -8,7 +8,7 @@ export default function AIPage() {
     {
       id: 1,
       role: "assistant",
-      content: "Halo! Saya **Lunasin AI**, konsultan finansial pribadimu. Saya telah menganalisis profil hutangmu.\n\nApa yang ingin kamu konsultasikan hari ini? Kamu bisa tanya tentang:\n• Strategi pelunasan terbaik\n• Cara negosiasi hutang\n• Hak kamu vs Debt Collector\n• Estimasi waktu lunas",
+      content: "Halo! Saya **Asisten Lunasin**, asisten finansial pribadimu. Saya telah menganalisis profil hutangmu.\n\nApa yang ingin kamu tanyakan hari ini? Kamu bisa tanya tentang:\n• Strategi pelunasan terbaik\n• Cara negosiasi hutang\n• Hak kamu vs Debt Collector\n• Estimasi waktu lunas",
     }
   ]);
   const [input, setInput] = useState("");
@@ -83,9 +83,9 @@ export default function AIPage() {
           </div>
           <div>
             <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
-              Lunasin AI <span className="bg-[#22C55E]/20 text-[#22C55E] text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-[#22C55E]/30">Live</span>
+              Asisten Lunasin <span className="bg-[#22C55E]/20 text-[#22C55E] text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest border border-[#22C55E]/30">Live</span>
             </h1>
-            <p className="text-xs text-gray-400 font-medium mt-0.5">Konsultan Finansial Pribadi Anda</p>
+            <p className="text-xs text-gray-400 font-medium mt-0.5">Asisten Finansial Pribadi Anda</p>
           </div>
         </div>
         <div className="hidden md:flex gap-2">

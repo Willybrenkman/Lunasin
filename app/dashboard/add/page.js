@@ -19,6 +19,7 @@ export default function AddDebt() {
   });
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
 
   // Hitung durasi otomatis
@@ -41,6 +42,7 @@ export default function AddDebt() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
     try {
       const response = await fetch("/api/debts", {
         method: "POST",
@@ -58,12 +60,13 @@ export default function AddDebt() {
       if (response.ok) {
         sessionStorage.removeItem("debts_cache");
         setSuccessMsg("Data hutang berhasil disimpan! 🚀");
-        setTimeout(() => {
-          router.push("/dashboard/debts");
-        }, 2000);
+        setTimeout(() => router.push("/dashboard/debts"), 2000);
+      } else {
+        const result = await response.json();
+        setErrorMsg(result.error || "Gagal menyimpan data. Silakan coba lagi.");
       }
     } catch (error) {
-      console.error(error);
+      setErrorMsg("Koneksi bermasalah. Periksa internet dan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -71,12 +74,22 @@ export default function AddDebt() {
 
   return (
     <div className="min-h-screen bg-[#06080C] p-6 md:p-10 flex justify-center text-white relative">
-      {/* Toast Notification */}
+      {/* Toast Sukses */}
       {successMsg && (
         <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
           <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(34,197,94,0.15)] backdrop-blur-md">
             <CheckCircle2 size={24} />
             <span className="font-black text-sm tracking-wide">{successMsg}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Error */}
+      {errorMsg && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-[0_10px_40px_rgba(239,68,68,0.15)] backdrop-blur-md">
+            <span className="text-xl">⚠️</span>
+            <span className="font-black text-sm tracking-wide">{errorMsg}</span>
           </div>
         </div>
       )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Shield, Wallet, ChevronRight, Save, Loader2, Check, LogOut, Pencil, X } from "lucide-react";
+import { Bell, Shield, ChevronRight, Loader2, Check, LogOut, Pencil, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
@@ -96,6 +96,8 @@ export default function Pengaturan() {
 
   const handleLogout = async () => {
     try {
+      sessionStorage.removeItem("debts_cache");
+      sessionStorage.removeItem("payments_cache");
       await supabase.auth.signOut();
     } catch (e) {
       console.error(e);
@@ -121,7 +123,7 @@ export default function Pengaturan() {
       {/* Profile Header */}
       <div className="flex items-center gap-6 bg-[#0F1319] p-8 rounded-[2rem] border border-white/5">
         <div className="w-24 h-24 bg-[#0A0D12] rounded-full overflow-hidden border-4 border-white/5">
-          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Profile" />
+          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Profile" loading="lazy" />
         </div>
         <div className="flex-1">
           {editMode ? (
