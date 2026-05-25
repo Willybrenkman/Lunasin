@@ -74,6 +74,7 @@ export async function PUT(req) {
 
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
+    if (Number(sisa) < 0 || Number(sisa) > Number(total)) return NextResponse.json({ error: "Sisa hutang tidak valid." }, { status: 400 });
     if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
     if (Number(interest) < 0 || Number(interest) > 200) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
 

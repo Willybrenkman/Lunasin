@@ -11,6 +11,18 @@ export async function POST(req) {
     const body = await req.json();
     const { debt_id, amount, payment_date, notes } = body;
 
+    if (Number(amount) <= 0) return NextResponse.json({ error: "Jumlah pembayaran harus lebih dari 0." }, { status: 400 });
+    if (!debt_id) return NextResponse.json({ error: "Hutang tidak valid." }, { status: 400 });
+
+    // Pastikan debt_id milik user yang login (cegah manipulasi hutang orang lain)
+    const { data: debtCheck } = await supabase
+      .from("debts")
+      .select("id")
+      .eq("id", debt_id)
+      .eq("user_id", user.id)
+      .single();
+    if (!debtCheck) return NextResponse.json({ error: "Hutang tidak ditemukan." }, { status: 404 });
+
     // 1. Catat ke tabel payments
     const { data: payment, error: paymentError } = await supabase
       .from("payments")

@@ -42,13 +42,17 @@ export default function PengingatPage() {
 
   // Compute upcoming debts from real data based on monthly schedule (tanggal_tagihan)
   const today = new Date();
+  // Clamp hari ke hari terakhir bulan (cegah overflow: 31 Feb → 3 Mar)
+  const clampDay = (year, month, day) => {
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    return new Date(year, month, Math.min(day, lastDay));
+  };
+
   const upcomingDebts = debts.filter(d => d.tanggal_tagihan).map(d => {
-    let dueDate = new Date(today.getFullYear(), today.getMonth(), d.tanggal_tagihan);
-    
-    // If the due date has already passed this month, schedule it for next month
-    // We give a 1-day grace period where it still shows "Hari ini!"
+    let dueDate = clampDay(today.getFullYear(), today.getMonth(), d.tanggal_tagihan);
+
     if (dueDate.getDate() < today.getDate()) {
-      dueDate = new Date(today.getFullYear(), today.getMonth() + 1, d.tanggal_tagihan);
+      dueDate = clampDay(today.getFullYear(), today.getMonth() + 1, d.tanggal_tagihan);
     }
 
     const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
