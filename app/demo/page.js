@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Wallet, BarChart3, Calendar, TrendingUp, Crown, Brain, 
-  Pencil, Lock, ArrowRight, Sparkles, X
+  Wallet, BarChart3, Crown, Brain,
+  ArrowRight, Sparkles, X
 } from "lucide-react";
 import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, 
@@ -69,8 +69,8 @@ export default function DemoPage() {
               <BarChart3 size={20} /> Dashboard
             </div>
             {["Hutang Saya", "Simulasi", "Pembayaran", "Laporan", "Pengingat", "Konsultan AI", "Bonus Premium"].map((item) => (
-              <div key={item} className="flex items-center gap-4 p-3 rounded-xl text-gray-500 font-bold text-[13px] cursor-not-allowed opacity-50">
-                <Lock size={16} /> {item}
+              <div key={item} className="flex items-center gap-4 p-3 rounded-xl text-gray-500 font-bold text-[13px] select-none pointer-events-none blur-[1.5px]">
+                <span className="w-4 h-4 rounded bg-white/10 shrink-0" /> {item}
               </div>
             ))}
           </nav>
@@ -220,7 +220,7 @@ export default function DemoPage() {
   );
 }
 
-function StatCard({ label, value, sub, color, bg }) {
+function StatCard({ label, value, sub, color }) {
   return (
     <div className="bg-[#0F1319] border border-white/5 rounded-3xl p-6">
       <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">{label}</p>
