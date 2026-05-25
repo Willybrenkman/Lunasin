@@ -18,7 +18,6 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const { isPrivate, togglePrivacy } = usePrivacy();
   const [profile, setProfile] = useState({ display_name: "User", is_pro: false, email: "" });
-  const [profileLoaded, setProfileLoaded] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,8 +51,7 @@ export default function DashboardLayout({ children }) {
             }
           }
         }
-      } finally {
-        setProfileLoaded(true);
+      } catch {
       }
     }
     loadProfile();
@@ -301,7 +299,7 @@ export default function DashboardLayout({ children }) {
         )}
 
         <div className="p-6 lg:p-12 flex-1 max-w-[1600px] mx-auto w-full">
-          <ProLock isLocked={profileLoaded && !profile.is_pro && !['/dashboard', '/dashboard/simulasi'].includes(pathname)}>
+          <ProLock isLocked={false}>
             {children}
           </ProLock>
         </div>
