@@ -282,31 +282,7 @@ function Pricing() {
           <p className="text-gray-500 font-medium">Mulai gratis, upgrade kapan saja saat kamu butuh fitur lengkap.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Free */}
-          <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8">
-            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Free</p>
-            <p className="text-5xl font-black mb-2">Rp 0</p>
-            <p className="text-gray-500 text-sm font-medium mb-8">Selamanya gratis</p>
-            <ul className="space-y-3 mb-8">
-              {["Catat hingga 3 hutang", "Strategi Snowball & Avalanche", "Dashboard & ringkasan", "Asisten Keuangan AI"].map((f, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-300">
-                  <CheckCircle2 size={16} className="text-gray-500 shrink-0" /> {f}
-                </li>
-              ))}
-              {["Laporan & Analitik Detail", "Export Laporan PDF"].map((f, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-600 line-through">
-                  <CheckCircle2 size={16} className="text-gray-700 shrink-0" /> {f}
-                </li>
-              ))}
-            </ul>
-            <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
-              <button className="w-full py-4 rounded-2xl border border-white/10 font-black text-sm hover:bg-white/5 transition-colors">
-                Mulai Gratis
-              </button>
-            </a>
-          </div>
-
+        <div className="max-w-lg mx-auto">
           {/* PRO */}
           <div className="bg-gradient-to-br from-[#D4AF37]/10 to-[#B8860B]/5 border border-gold/30 rounded-3xl p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-gold/10 blur-3xl rounded-full -mr-10 -mt-10" />
@@ -351,6 +327,7 @@ function Pricing() {
     </section>
   );
 }
+
 
 /* ─── TESTIMONIALS ─── */
 function Testimonials() {
