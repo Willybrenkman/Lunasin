@@ -55,7 +55,7 @@ export default function SimulasiPage() {
   const totalMinPayment = debts
     .filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
     .reduce((s, d) => s + Number(d.min_payment || 0), 0);
-  const estimasiBulan = chartData.length || 0;
+  const estimasiBulan = chartData.filter(d => d.total > 0).length || 0;
   const simResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), extraPayment) : { months: 0, totalInterest: 0 };
   const baselineResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), 0) : { months: 0, totalInterest: 0 };
   const simulasiInsight = debts.length > 0 ? generateSimulasiInsight({
