@@ -24,13 +24,18 @@ export default function DashboardLayout({ children }) {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
 
-  // Halaman yang hanya bisa diakses user PRO
+  // Semua sub-halaman dashboard hanya untuk user PRO (tidak ada free tier)
   const proOnlyPaths = [
+    "/dashboard/debts",
+    "/dashboard/add",
+    "/dashboard/simulasi",
     "/dashboard/pembayaran",
     "/dashboard/laporan",
     "/dashboard/bonus",
     "/dashboard/ai",
     "/dashboard/pengingat",
+    "/dashboard/panduan",
+    "/dashboard/pengaturan",
   ];
   const isProPage = proOnlyPaths.some(p => pathname.startsWith(p));
   const isLocked = profileLoaded && !profile.is_pro && isProPage;
