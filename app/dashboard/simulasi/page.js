@@ -51,58 +51,57 @@ export default function SimulasiPage() {
     }
   }, [strategy, debts, extraPayment]);
 
-  // Hitung summary dari data real + simulasi
   const totalMinPayment = debts
     .filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
     .reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.filter(d => d.total > 0).length || 0;
-  const simResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), extraPayment) : { months: 0, totalInterest: 0 };
-  const baselineResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), 0) : { months: 0, totalInterest: 0 };
-  const simulasiInsight = debts.length > 0 ? generateSimulasiInsight({
-    months: simResult.months,
-    totalInterest: simResult.totalInterest,
-    baselineMonths: baselineResult.months,
-    baselineInterest: baselineResult.totalInterest,
-    extraPayment,
-    strategy,
-  }) : "";
 
-  const round10k = (n) => Math.round(n / 10000) * 10000;
-  const extraAmounts = extraPayment > 0
-    ? [0, round10k(extraPayment * 0.25), round10k(extraPayment * 0.5), extraPayment, round10k(extraPayment * 2)]
-    : [0, 250000, 500000, 1000000, 1500000];
+  // Semua kalkulasi simulasi dalam satu blok — baseline dihitung SEKALI dan di-reuse
+  const { simResult, simulasiInsight, whatIfData } = (() => {
+    if (debts.length === 0) return { simResult: { months: 0, totalInterest: 0 }, simulasiInsight: "", whatIfData: [] };
 
-  const whatIfData = (() => {
-    if (debts.length === 0) return [];
+    const stratKey = strategy.toLowerCase();
+    const round10k = (n) => Math.round(n / 10000) * 10000;
 
-    const baseline = simulate(debts, strategy.toLowerCase(), 0);
+    const baseline = simulate(debts, stratKey, 0);
+    const current = extraPayment > 0 ? simulate(debts, stratKey, extraPayment) : baseline;
 
-    const rows = extraAmounts.map((extra) => {
-      const sim = extra === 0 ? baseline : simulate(debts, strategy.toLowerCase(), extra);
-      const rawSavings = Math.max(0, baseline.totalInterest - sim.totalInterest);
-      return { extra, months: sim.months, totalInterest: sim.totalInterest, rawSavings };
+    const amounts = extraPayment > 0
+      ? [0, round10k(extraPayment * 0.25), round10k(extraPayment * 0.5), extraPayment, round10k(extraPayment * 2)]
+      : [0, 250000, 500000, 1000000, 1500000];
+
+    const rows = amounts.map((extra) => {
+      const sim = extra === 0 ? baseline : extra === extraPayment ? current : simulate(debts, stratKey, extra);
+      return { extra, months: sim.months, totalInterest: sim.totalInterest, rawSavings: Math.max(0, baseline.totalInterest - sim.totalInterest) };
     });
 
-    // Optimal: skenario pertama yang mencapai ≥60% dari max penghematan waktu
     const maxSaved = rows[0].months - rows[rows.length - 1].months;
     let optimalIdx = 2;
     if (maxSaved > 0) {
       for (let i = 1; i < rows.length; i++) {
-        if (rows[0].months - rows[i].months >= maxSaved * 0.6) {
-          optimalIdx = i;
-          break;
-        }
+        if (rows[0].months - rows[i].months >= maxSaved * 0.6) { optimalIdx = i; break; }
       }
     }
 
-    return rows.map((row, idx) => ({
-      extra: formatMoney(row.extra),
-      months: `${row.months} bulan`,
-      totalInterest: formatMoney(row.totalInterest),
-      savings: formatMoney(row.rawSavings),
-      status: idx === optimalIdx ? "Optimal" : "",
-      isCurrent: row.extra === extraPayment,
-    }));
+    return {
+      simResult: current,
+      simulasiInsight: generateSimulasiInsight({
+        months: current.months,
+        totalInterest: current.totalInterest,
+        baselineMonths: baseline.months,
+        baselineInterest: baseline.totalInterest,
+        extraPayment,
+        strategy,
+      }),
+      whatIfData: rows.map((row, idx) => ({
+        extra: formatMoney(row.extra),
+        months: `${row.months} bulan`,
+        totalInterest: formatMoney(row.totalInterest),
+        savings: formatMoney(row.rawSavings),
+        status: idx === optimalIdx ? "Optimal" : "",
+        isCurrent: row.extra === extraPayment,
+      })),
+    };
   })();
 
   if (loading) return (
