@@ -131,7 +131,11 @@ export default function AddDebt() {
                 </div>
                 <select
                   value={debtType}
-                  onChange={e => { setDebtType(e.target.value); setForm(f => ({ ...f, interest: "" })); }}
+                  onChange={e => {
+                    const t = DEBT_TYPES.find(d => d.value === e.target.value);
+                    setDebtType(e.target.value);
+                    setForm(f => ({ ...f, interest: t?.defaultRate?.toString() ?? "" }));
+                  }}
                   className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-10 focus:border-gold outline-none transition-all text-white font-medium appearance-none cursor-pointer"
                 >
                   {DEBT_TYPES.map(t => (

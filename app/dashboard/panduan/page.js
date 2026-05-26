@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, PlayCircle, BookOpen, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 export default function PanduanPage() {
   return (
@@ -24,6 +24,22 @@ export default function PanduanPage() {
               <li>Masukkan Suku Bunga dan Cicilan Minimum bulanan.</li>
               <li>Jangan lupa memasukkan Tanggal Jatuh Tempo agar sistem bisa mengingatkan Anda.</li>
             </ul>
+            <div className="mt-4 bg-gold/5 border border-gold/20 rounded-xl p-4">
+              <p className="text-xs font-bold text-gold mb-2">💡 Tips: Bunga Otomatis Terisi</p>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Saat kamu memilih jenis hutang, field bunga akan otomatis terisi dengan nilai umum sebagai panduan awal:
+              </p>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1 mt-3 text-xs text-gray-400">
+                <span>• Kartu Kredit → <b className="text-white">2.5%/bulan</b></span>
+                <span>• PayLater → <b className="text-white">2%/bulan</b></span>
+                <span>• Pinjol → <b className="text-white">0.4%/hari</b></span>
+                <span>• KPR → <b className="text-white">10%/tahun</b></span>
+                <span>• KTA → <b className="text-white">12% flat/tahun</b></span>
+                <span>• Leasing → <b className="text-white">8% flat/tahun</b></span>
+                <span>• Hutang Keluarga → <b className="text-white">0%</b></span>
+              </div>
+              <p className="text-xs text-gray-500 mt-3">Angka ini bisa kamu ubah sesuai kontrak atau tagihan aslimu. Semakin akurat angka yang dimasukkan, semakin akurat hasil simulasinya.</p>
+            </div>
           </div>
         </section>
 
