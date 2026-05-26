@@ -16,6 +16,7 @@ import { recommend } from "@/lib/recommendation";
 import { getAchievements } from "@/lib/achievement";
 import DebtCalendar from "@/components/DebtCalendar";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
+import Tooltip from "@/components/Tooltip";
 
 export default function Dashboard() {
   const [debts, setDebts] = useState([]);
@@ -129,14 +130,14 @@ export default function Dashboard() {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard label="Total Hutang" value={formatMoney(totalHutang)} sub={`${debts.length} hutang aktif`} icon={<Wallet size={20} />} color="text-purple-400" bgColor="bg-purple-500/10" />
-        <StatCard label="Sisa Hutang" value={formatMoney(sisaHutang)} sub={totalHutang > 0 ? `${((sisaHutang / totalHutang) * 100).toFixed(1)}% dari total` : "0%"} icon={<BarChart3 size={20} />} color="text-green-400" bgColor="bg-green-500/10" />
-        <StatCard label="Estimasi Lunas" value={chartData.length > 0 ? `${chartData.length} bulan` : "-"} sub="" icon={<Calendar size={20} />} color="text-blue-400" bgColor="bg-blue-500/10" />
+        <StatCard label="Total Hutang" tooltip="Jumlah semua hutang awal yang pernah kamu catat, sebelum ada pembayaran apapun." value={formatMoney(totalHutang)} sub={`${debts.length} hutang aktif`} icon={<Wallet size={20} />} color="text-purple-400" bgColor="bg-purple-500/10" />
+        <StatCard label="Sisa Hutang" tooltip="Total hutang yang belum terbayar sampai hari ini. Angka ini berkurang setiap kamu mencatat pembayaran." value={formatMoney(sisaHutang)} sub={totalHutang > 0 ? `${((sisaHutang / totalHutang) * 100).toFixed(1)}% dari total` : "0%"} icon={<BarChart3 size={20} />} color="text-green-400" bgColor="bg-green-500/10" />
+        <StatCard label="Estimasi Lunas" tooltip="Proyeksi berapa bulan lagi kamu bebas hutang, dihitung berdasarkan strategi dan extra payment yang dipilih. Bukan angka pasti — berubah sesuai simulasimu." value={chartData.length > 0 ? `${chartData.filter(d => d.total > 0).length} bulan` : "-"} sub="" icon={<Calendar size={20} />} color="text-blue-400" bgColor="bg-blue-500/10" />
 
         {/* Progress Card */}
         <div className="luxury-card rounded-3xl p-6 transition-all group">
           <div className="flex justify-between items-start mb-6">
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Progress</p>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center">Progress <Tooltip text="Persentase hutang yang sudah terbayar. Dihitung dari (Total Hutang - Sisa Hutang) / Total Hutang × 100%. Semakin tinggi semakin baik." /></p>
             <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
               <TrendingUp size={20} />
             </div>
@@ -165,7 +166,7 @@ export default function Dashboard() {
         <div>
           <div className="luxury-card-highlight rounded-[2rem] p-8 h-full flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-[10px] mb-6 text-gray-500 uppercase tracking-widest">Strategi Terbaik Untuk Kamu</h3>
+              <h3 className="font-bold text-[10px] mb-6 text-gray-500 uppercase tracking-widest flex items-center">Strategi Terbaik Untuk Kamu <Tooltip text="Lunasin merekomendasikan strategi berdasarkan kombinasi bunga, sisa hutang, dan cicilan minimummu. Kamu bisa ganti strategi dari grafik." /></h3>
 
               <div className="bg-gold/10 border border-gold/20 rounded-2xl p-5 mb-6">
                 <div className="flex items-center gap-3 mb-3">
@@ -195,7 +196,7 @@ export default function Dashboard() {
 
             <div className="space-y-4 mt-auto">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Extra Payment / bulan</label>
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 flex items-center">Extra Payment / bulan <Tooltip text="Jumlah tambahan di atas cicilan minimum yang bisa kamu bayar tiap bulan. Semakin besar extra payment, semakin cepat lunas dan semakin hemat bunga." /></label>
                 {editingExtra ? (
                   <input
                     type="number"
@@ -423,11 +424,11 @@ function DebtRow({ name, total, sisa, tanggalTagihan, interest, min, tanggalMula
   );
 }
 
-function StatCard({ label, value, sub, icon, color, bgColor }) {
+function StatCard({ label, tooltip, value, sub, icon, color, bgColor }) {
   return (
     <div className="luxury-card rounded-3xl p-6 transition-all group">
       <div className="flex justify-between items-start mb-6">
-        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{label}</p>
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center">{label}{tooltip && <Tooltip text={tooltip} />}</p>
         <div className={`p-2.5 rounded-xl ${bgColor} ${color}`}>
           {icon}
         </div>

@@ -7,6 +7,7 @@ import { calculatePlan, simulate, detectNonConvergent } from "@/lib/calculate";
 import { generateSimulasiInsight } from "@/lib/insight";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
+import Tooltip from "@/components/Tooltip";
 
 export default function SimulasiPage() {
   const [chartData, setChartData] = useState([]);
@@ -164,7 +165,7 @@ export default function SimulasiPage() {
         {/* Strategi Selector */}
         <div className="lg:col-span-4 space-y-6">
           <div className="luxury-card rounded-[2rem] p-8 h-full">
-            <h3 className="font-bold text-[11px] text-gray-500 uppercase tracking-widest mb-6">Pilih Strategi</h3>
+            <h3 className="font-bold text-[11px] text-gray-500 uppercase tracking-widest mb-6 flex items-center">Pilih Strategi <Tooltip text="Strategi menentukan urutan hutang mana yang dilunasi duluan saat ada extra payment. Pilih yang sesuai kondisi dan prioritasmu." /></h3>
             <div className="space-y-3">
                <StrategyOption 
                   active={strategy === "Smart Priority"} 
@@ -189,7 +190,7 @@ export default function SimulasiPage() {
             
             <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
               <div className="flex flex-col gap-2">
-                 <label className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Extra Payment / bulan (Rp)</label>
+                 <label className="text-[11px] text-gray-500 font-bold uppercase tracking-widest flex items-center">Extra Payment / bulan (Rp) <Tooltip text="Uang tambahan di atas cicilan minimum yang kamu bayar tiap bulan. Extra payment ini dialokasikan ke hutang prioritas teratas sesuai strategi yang dipilih." /></label>
                  <div className="relative">
                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rp</span>
                    <input 
@@ -216,16 +217,16 @@ export default function SimulasiPage() {
             <h3 className="font-bold text-sm text-white mb-6">Hasil Simulasi ({strategy})</h3>
             <div className="grid md:grid-cols-3 gap-6 mb-8">
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Estimasi Bebas Hutang</p>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 flex items-center">Estimasi Bebas Hutang <Tooltip text="Proyeksi berapa bulan lagi semua hutangmu lunas dengan strategi dan extra payment yang dipilih. Berubah otomatis saat kamu ganti strategi atau extra payment." /></p>
                  <p className="font-black text-white text-lg">{estimasiBulan > 0 ? `${estimasiBulan} bulan` : "-"}</p>
                </div>
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Bunga Terhitung</p>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 flex items-center">Total Bunga Terhitung <Tooltip text="Total bunga yang akan kamu bayar dari sekarang sampai lunas. Semakin besar extra payment atau semakin baik strateginya, angka ini makin kecil." /></p>
                  <p className="font-black text-white text-lg">{formatMoney(simResult.totalInterest)}</p>
                  <p className="text-[9px] text-gray-500 mt-1">Proyeksi bunga sampai lunas</p>
                </div>
                <div className="bg-[#22C55E]/10 p-5 rounded-2xl border border-[#22C55E]/20">
-                 <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-widest mb-1">Total Cicilan / Bulan</p>
+                 <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-widest mb-1 flex items-center">Total Cicilan / Bulan <Tooltip text="Jumlah cicilan minimum dari semua hutang aktifmu per bulan. Ini angka real dari data — bukan proyeksi. Kamu harus bayar minimal segini setiap bulan." /></p>
                  <p className="font-black text-[#22C55E] text-xl">{formatMoney(totalMinPayment)}</p>
                  <p className="text-[9px] text-[#22C55E] mt-1 opacity-80">Cicilan minimum dari semua hutang</p>
                </div>
@@ -248,7 +249,7 @@ export default function SimulasiPage() {
         <div className="lg:col-span-12">
           <div className="luxury-card rounded-[2rem] overflow-hidden">
             <div className="p-8 border-b border-white/5">
-              <h3 className="font-black text-sm text-white tracking-tight mb-1 uppercase tracking-widest">Coba Berbagai Skenario Pembayaran</h3>
+              <h3 className="font-black text-sm text-white tracking-tight mb-1 uppercase tracking-widest flex items-center">Coba Berbagai Skenario Pembayaran <Tooltip text="Perbandingan otomatis 5 skenario extra payment di sekitar angka yang kamu input. Badge 'Saat ini' = extra payment aktifmu. Badge 'Optimal' = titik terbaik antara penghematan dan beban bayar." /></h3>
               <p className="text-xs text-gray-500 font-medium">Lihat bagaimana perubahan extra payment memengaruhi waktu lunas dan bunga.</p>
             </div>
             <div className="overflow-x-auto">
