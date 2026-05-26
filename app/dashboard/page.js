@@ -27,6 +27,8 @@ export default function Dashboard() {
   const [insight, setInsight] = useState("");
   const [recommendationMsg, setRecommendationMsg] = useState("");
   const [achievements, setAchievements] = useState([]);
+  const [shareModal, setShareModal] = useState(false);
+  const [waNumber, setWaNumber] = useState("");
   const { formatMoney } = usePrivacy();
 
   // Fetch data sekali saat mount
@@ -254,8 +256,11 @@ export default function Dashboard() {
                </div>
              </div>
              
-             <button className="mt-8 w-full bg-blue-600/20 text-blue-400 font-black py-4 rounded-xl border border-blue-500/30 hover:bg-blue-600/30 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 relative z-10">
-                <Share2 size={16} /> Bagikan Hasil Saya
+             <button
+               onClick={() => setShareModal(true)}
+               className="mt-8 w-full bg-blue-600/20 text-blue-400 font-black py-4 rounded-xl border border-blue-500/30 hover:bg-blue-600/30 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2 relative z-10"
+             >
+               <Share2 size={16} /> Bagikan Hasil Saya
              </button>
           </div>
         </div>
@@ -285,6 +290,50 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+      {/* Share to WhatsApp Modal */}
+      {shareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="luxury-card rounded-[2rem] p-8 w-full max-w-md">
+            <h3 className="font-black text-lg text-white mb-1">Bagikan ke WhatsApp</h3>
+            <p className="text-xs text-gray-500 mb-6">Masukkan nomor WA tujuan. Ringkasan hutangmu akan dikirim otomatis.</p>
+            <div className="relative mb-4">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">+62</span>
+              <input
+                type="tel"
+                placeholder="8123456789"
+                value={waNumber}
+                onChange={(e) => setWaNumber(e.target.value.replace(/\D/g, ""))}
+                className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-14 pr-4 text-white font-bold outline-none focus:border-gold transition-colors"
+              />
+            </div>
+            <div className="bg-black/30 rounded-xl p-4 mb-6 text-xs text-gray-400 leading-relaxed whitespace-pre-line">
+              {`📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${chartData.length > 0 ? `${chartData.length} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShareModal(false); setWaNumber(""); }}
+                className="flex-1 bg-white/5 text-gray-400 font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  if (!waNumber) return;
+                  const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : `62${waNumber}`;
+                  const pesan = `📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${chartData.length > 0 ? `${chartData.length} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`;
+                  window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
+                  setShareModal(false);
+                  setWaNumber("");
+                }}
+                className="flex-1 bg-[#25D366] text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest hover:brightness-110 transition-all"
+              >
+                Kirim ke WA
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Debt Table Section — Now dynamic from fetched data */}
       <div className="luxury-card rounded-[2rem] overflow-hidden">
