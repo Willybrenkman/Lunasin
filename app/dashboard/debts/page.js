@@ -263,7 +263,7 @@ export default function DebtsPage() {
                 <th className="px-8 py-5">Nama Hutang</th>
                 <th className="px-8 py-5">Progress</th>
                 <th className="px-8 py-5">Jadwal Tagihan</th>
-                <th className="px-8 py-5">Bunga / Thn</th>
+                <th className="px-8 py-5">Bunga</th>
                 <th className="px-8 py-5">Minimum / Bln</th>
                 <th className="px-8 py-5">Durasi</th>
                 <th className="px-8 py-5 text-center">Status</th>
@@ -321,9 +321,17 @@ export default function DebtsPage() {
 
                     {/* Bunga */}
                     <td className="px-8 py-5">
-                      <span className={`text-sm font-bold ${Number(d.interest) >= 24 ? "text-red-400" : Number(d.interest) >= 12 ? "text-gold" : "text-gray-300"}`}>
-                        {d.interest}%
-                      </span>
+                      {(() => {
+                        const displayRate = typeConfig.reverseConvert(Number(d.interest));
+                        const unitMap = { annual: "%/thn", monthly: "%/bln", flat_annual: "%flat/thn", daily: "%/hari" };
+                        const unit = unitMap[typeConfig.rateType] || "%/thn";
+                        const annualRate = Number(d.interest);
+                        return (
+                          <span className={`text-sm font-bold ${annualRate >= 24 ? "text-red-400" : annualRate >= 12 ? "text-gold" : "text-gray-300"}`}>
+                            {Number.isInteger(displayRate) ? displayRate : displayRate.toFixed(2).replace(/\.?0+$/, "")}{unit}
+                          </span>
+                        );
+                      })()}
                     </td>
 
                     {/* Min Payment */}
