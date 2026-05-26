@@ -66,9 +66,9 @@ export default function Pembayaran() {
       // Ambil daftar hutang aktif untuk dropdown pilihan
       const { data: debtData } = await supabase
         .from("debts")
-        .select("id, name, sisa, total")
+        .select("*")
         .eq("user_id", user.id);
-        
+
       if (debtData) {
         setDebts(debtData);
         sessionStorage.setItem("debts_cache", JSON.stringify(debtData));

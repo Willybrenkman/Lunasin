@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { generateInsight } from "@/lib/insight";
 import { simulate, detectNonConvergent } from "@/lib/calculate";
+import { getDebtTypeConfig } from "@/lib/debtTypes";
 import { recommend } from "@/lib/recommendation";
 import { getAchievements } from "@/lib/achievement";
 import DebtCalendar from "@/components/DebtCalendar";
@@ -394,21 +395,27 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {debts.map((d) => (
+              {debts.map((d) => {
+                const tc = getDebtTypeConfig(d.debt_type);
+                const displayRate = tc.reverseConvert(Number(d.interest));
+                const unitMap = { annual: "%/thn", monthly: "%/bln", flat_annual: "%flat/thn", daily: "%/hari" };
+                const rateStr = (Number.isInteger(displayRate) ? displayRate : displayRate.toFixed(2).replace(/\.?0+$/, "")) + (unitMap[tc.rateType] || "%/thn");
+                return (
                   <DebtRow
                     key={d.id}
                     name={d.name}
                     total={formatMoney(d.total)}
                     sisa={formatMoney(d.sisa ?? d.total)}
                     tanggalTagihan={d.tanggal_tagihan}
-                    interest={`${d.interest}%`}
+                    interest={rateStr}
                     min={formatMoney(d.min_payment)}
                     tanggalMulai={d.tanggal_mulai}
                     jatuhTempo={d.jatuh_tempo}
                     status={d.status}
                     sisaRaw={Number(d.sisa ?? d.total)}
                   />
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
