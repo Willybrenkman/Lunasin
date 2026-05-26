@@ -50,12 +50,12 @@ export default function SimulasiPage() {
     }
   }, [strategy, debts, extraPayment]);
 
-  // Hitung summary dari data real
-  const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
+  // Hitung summary dari data real + simulasi
   const totalMinPayment = debts
     .filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
     .reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
+  const simResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), extraPayment) : { months: 0, totalInterest: 0 };
 
   const round10k = (n) => Math.round(n / 10000) * 10000;
   const extraAmounts = extraPayment > 0
@@ -211,8 +211,9 @@ export default function SimulasiPage() {
                  <p className="font-black text-white text-lg">{estimasiBulan > 0 ? `${estimasiBulan} bulan` : "-"}</p>
                </div>
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
-                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Sisa Hutang</p>
-                 <p className="font-black text-white text-lg">{formatMoney(totalSisa)}</p>
+                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Bunga Terhitung</p>
+                 <p className="font-black text-white text-lg">{formatMoney(simResult.totalInterest)}</p>
+                 <p className="text-[9px] text-gray-500 mt-1">Proyeksi bunga sampai lunas</p>
                </div>
                <div className="bg-[#22C55E]/10 p-5 rounded-2xl border border-[#22C55E]/20">
                  <p className="text-[10px] font-bold text-[#22C55E] uppercase tracking-widest mb-1">Total Cicilan / Bulan</p>
