@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
+// In-memory rate limit: maks 30 pesan per user per jam
+const rateLimitMap = new Map();
+function checkRateLimit(userId) {
+  const now = Date.now();
+  const recent = (rateLimitMap.get(userId) || []).filter(t => now - t < 60 * 60 * 1000);
+  if (recent.length >= 30) return false;
+  rateLimitMap.set(userId, [...recent, now]);
+  return true;
+}
+
 function formatRp(num) {
   return `Rp ${Number(num).toLocaleString("id-ID")}`;
 }
@@ -337,6 +347,15 @@ export async function POST(req) {
 
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    if (!checkRateLimit(user.id)) {
+      return NextResponse.json(
+        { response: "Kamu sudah mencapai batas 30 pesan per jam. Istirahat sebentar dan coba lagi nanti ya! 🙏" },
+        { status: 429 }
+      );
+    }
 
     let debts = [];
     if (user) {
