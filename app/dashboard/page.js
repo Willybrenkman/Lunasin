@@ -198,7 +198,16 @@ export default function Dashboard() {
                     type="number"
                     value={extraPaymentInput}
                     onChange={(e) => setExtraPaymentInput(e.target.value)}
-                    onBlur={() => setEditingExtra(false)}
+                    onBlur={() => {
+                      setEditingExtra(false);
+                      setExtraPayment(Number(extraPaymentInput) || 0);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setEditingExtra(false);
+                        setExtraPayment(Number(extraPaymentInput) || 0);
+                      }
+                    }}
                     autoFocus
                     className="w-full bg-black/40 border border-gold rounded-2xl py-3 px-4 text-white font-black outline-none"
                   />
