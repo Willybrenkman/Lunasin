@@ -1,7 +1,6 @@
 "use client";
 
 import { Lock, Crown, ExternalLink } from "lucide-react";
-import Link from "next/link";
 
 export default function ProLock({ children, isLocked = false }) {
   if (!isLocked) return children;
@@ -35,7 +34,7 @@ export default function ProLock({ children, isLocked = false }) {
               <Crown size={18} /> Dapatkan Akses PRO
             </a>
             <a
-              href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20sudah%20punya%20kode%20unix%20tapi%20belum%20bisa%20akses"
+              href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20sudah%20punya%20kode%20unik%20tapi%20belum%20bisa%20akses"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-white font-bold py-3 px-8 rounded-2xl hover:bg-white/10 transition-all text-xs"

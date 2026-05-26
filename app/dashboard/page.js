@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { generateInsight } from "@/lib/insight";
-import { simulate } from "@/lib/calculate";
+import { simulate, detectNonConvergent } from "@/lib/calculate";
 import { recommend } from "@/lib/recommendation";
 import { getAchievements } from "@/lib/achievement";
 import DebtCalendar from "@/components/DebtCalendar";
@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [recommendationMsg, setRecommendationMsg] = useState("");
   const [achievements, setAchievements] = useState([]);
   const [simMonths, setSimMonths] = useState(0);
+  const [nonConvergent, setNonConvergent] = useState([]);
   const [shareModal, setShareModal] = useState(false);
   const [waNumber, setWaNumber] = useState("");
   const { formatMoney } = usePrivacy();
@@ -69,6 +70,7 @@ export default function Dashboard() {
       setSimMonths(simSummary.months);
       setInsight(generateInsight({ months: simSummary.months, totalInterest: simSummary.totalInterest, extraPayment, strategy }));
       setRecommendationMsg(recommend(debts));
+      setNonConvergent(detectNonConvergent(debts));
 
       const totalAwal = debts.reduce((s, d) => s + Number(d.total || 0), 0);
       const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
@@ -130,6 +132,23 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
+      {/* Non-convergent warning */}
+      {nonConvergent.length > 0 && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5">
+          <p className="text-sm font-black text-red-400 mb-2">⚠️ Peringatan: {nonConvergent.length} hutang tidak akan pernah lunas</p>
+          <p className="text-xs text-gray-400 mb-3">Cicilan minimum lebih kecil dari bunga bulanan — hutang ini terus bertambah meski dibayar rutin.</p>
+          <div className="space-y-1">
+            {nonConvergent.map((d, i) => (
+              <p key={i} className="text-xs text-gray-300">
+                <span className="font-bold text-white">{d.name}</span>: cicilan min{" "}
+                <span className="text-red-400">Rp {d.minPayment.toLocaleString("id-ID")}</span> &lt; bunga bulanan{" "}
+                <span className="text-red-400">Rp {d.monthlyInterest.toLocaleString("id-ID")}</span> — naikkan ke minimal{" "}
+                <span className="text-gold font-bold">Rp {d.suggestedMin.toLocaleString("id-ID")}</span>
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard label="Total Hutang" tooltip="Jumlah semua hutang awal yang pernah kamu catat, sebelum ada pembayaran apapun." value={formatMoney(totalHutang)} sub={`${debts.length} hutang aktif`} icon={<Wallet size={20} />} color="text-purple-400" bgColor="bg-purple-500/10" />
@@ -184,7 +203,7 @@ export default function Dashboard() {
               <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 rounded-2xl p-5 mb-6">
                  <div className="flex items-center gap-2 mb-2">
                    <Brain size={16} className="text-[#22C55E]" />
-                   <h4 className="font-black text-xs text-[#22C55E] uppercase tracking-widest">AI Insight</h4>
+                   <h4 className="font-black text-xs text-[#22C55E] uppercase tracking-widest">Insight Keuangan</h4>
                  </div>
                  <p className="text-[11px] text-gray-300 font-medium leading-relaxed">
                    {insight || "Memproses data finansialmu..."}
@@ -323,7 +342,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="bg-black/30 rounded-xl p-4 mb-6 text-xs text-gray-400 leading-relaxed whitespace-pre-line">
-              {`📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${chartData.length > 0 ? `${chartData.length} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`}
+              {`📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`}
             </div>
             <div className="flex gap-3">
               <button
@@ -336,7 +355,7 @@ export default function Dashboard() {
                 onClick={() => {
                   if (!waNumber) return;
                   const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : `62${waNumber}`;
-                  const pesan = `📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${chartData.length > 0 ? `${chartData.length} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`;
+                  const pesan = `📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`;
                   window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
                   setShareModal(false);
                   setWaNumber("");

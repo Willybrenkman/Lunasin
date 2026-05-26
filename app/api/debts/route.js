@@ -32,7 +32,7 @@ export async function POST(req) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes } = body;
+    const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes, debt_type } = body;
 
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
@@ -45,6 +45,7 @@ export async function POST(req) {
         {
           user_id: user.id,
           name,
+          debt_type: debt_type || "lainnya",
           total: Number(total),
           sisa: Number(total),
           interest: Number(interest),
@@ -67,7 +68,7 @@ export async function PUT(req) {
   const supabase = await createSupabaseServerClient();
   try {
     const body = await req.json();
-    const { id, name, total, sisa, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, status, notes } = body;
+    const { id, name, total, sisa, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, status, notes, debt_type } = body;
 
     if (!id) return NextResponse.json({ error: "ID tidak valid." }, { status: 400 });
 
@@ -82,6 +83,7 @@ export async function PUT(req) {
 
     const updateData = {
       name,
+      ...(debt_type && { debt_type }),
       total: Number(total),
       sisa: Number(sisa),
       interest: Number(interest),

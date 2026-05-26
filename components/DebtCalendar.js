@@ -4,7 +4,11 @@ import { CalendarDays, AlertCircle } from "lucide-react";
 import { getUpcomingDebts } from "@/lib/reminder";
 
 export default function DebtCalendar({ debts }) {
-  const upcoming = getUpcomingDebts(debts);
+  const stored = typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("pengingat_settings") || "{}")
+    : {};
+  const days = parseInt(stored.reminderDays) || 3;
+  const upcoming = getUpcomingDebts(debts, days);
 
   return (
     <div className="luxury-card rounded-[2rem] p-8 h-full">

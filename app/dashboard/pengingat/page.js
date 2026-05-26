@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function PengingatPage() {
   const [enabled, setEnabled] = useState(true);
-  const [emailNotif, setEmailNotif] = useState(true);
+  const [emailNotif, setEmailNotif] = useState(false);
   const [reminderDays, setReminderDays] = useState("3 hari sebelum jatuh tempo");
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
@@ -139,13 +139,14 @@ export default function PengingatPage() {
           <div className="space-y-3">
             <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Metode</label>
 
-            <CheckboxRow
-              icon={<Mail size={18} />}
-              label="Email"
-              sub={userEmail || "Belum tersedia"}
-              checked={emailNotif}
-              onChange={setEmailNotif}
-            />
+            <div className="flex items-center gap-4 p-4 bg-black/20 border border-white/5 rounded-2xl opacity-50 cursor-not-allowed select-none">
+              <div className="w-5 h-5 rounded border-2 border-white/20 flex items-center justify-center" />
+              <div className="text-gray-400"><Mail size={18} /></div>
+              <div className="flex-1">
+                <p className="font-bold text-sm text-white">Email</p>
+                <p className="text-[11px] text-gray-500 font-medium mt-0.5">Segera hadir</p>
+              </div>
+            </div>
 
             <div className="flex items-center gap-4 p-4 bg-black/20 border border-white/5 rounded-2xl opacity-50 cursor-not-allowed select-none">
               <div className="w-5 h-5 rounded border-2 border-white/20 flex items-center justify-center" />

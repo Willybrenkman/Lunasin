@@ -175,7 +175,7 @@ export default function AIPage() {
         <div className="mt-4 flex justify-center gap-6">
            <div className="flex items-center gap-1.5">
              <Sparkles size={12} className="text-[#22C55E]" />
-             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Powered by Lunasin AI Engine</span>
+             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Asisten Keuangan Lunasin</span>
            </div>
         </div>
       </div>

@@ -19,6 +19,7 @@ export default function Pengaturan() {
     is_pro: false,
     pro_activated_at: null,
     created_at: null,
+    last_sign_in_at: null,
   });
   const [editName, setEditName] = useState("");
 
@@ -45,6 +46,7 @@ export default function Pengaturan() {
             is_pro: profileData.is_pro || false,
             pro_activated_at: profileData.pro_activated_at,
             created_at: profileData.created_at,
+            last_sign_in_at: user.last_sign_in_at || null,
           });
           setEditName(profileData.display_name || "");
         }
@@ -188,7 +190,7 @@ export default function Pengaturan() {
               <InfoRow label="Email" value={profile.email} />
               <InfoRow label="Status" value={profile.is_pro ? "Pro Member" : "Free Account"} highlight={profile.is_pro} />
               <InfoRow label="Bergabung Sejak" value={formatDate(profile.created_at)} />
-              <InfoRow label="Login Terakhir" value="Hari ini" />
+              <InfoRow label="Login Terakhir" value={formatDate(profile.last_sign_in_at)} />
             </div>
           </div>
         </div>

@@ -105,7 +105,7 @@ function Hero() {
 
           <div className="flex flex-wrap justify-center gap-6 pt-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Setup 2 menit</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Data aman & terenkripsi</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Data aman di server Supabase</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Bayar sekali, akses selamanya</span>
           </div>
         </motion.div>
@@ -164,10 +164,10 @@ function Hero() {
 /* ─── TRUST BAR ─── */
 function TrustBar() {
   const stats = [
-    { value: "500+", label: "Pengguna Aktif" },
-    { value: "Rp 2M+", label: "Hutang Terlacak" },
-    { value: "3 Strategi", label: "Pelunasan Cerdas" },
-    { value: "100%", label: "Data Terenkripsi" },
+    { value: "3", label: "Strategi Pelunasan" },
+    { value: "Snowball", label: "Avalanche & Smart Priority" },
+    { value: "Real-Time", label: "Kalkulasi Otomatis" },
+    { value: "Supabase", label: "Data Aman & Terlindungi" },
   ];
   return (
     <section className="py-12 border-y border-white/5 bg-white/[0.01]">
@@ -216,9 +216,9 @@ function Features() {
   const features = [
     { icon: <TrendingDown size={24} />, title: "Strategi Snowball & Avalanche", desc: "Pilih strategi yang sesuai: Snowball (hutang terkecil dulu) atau Avalanche (bunga tertinggi dulu) untuk hasil optimal." },
     { icon: <BarChart3 size={24} />, title: "Simulasi & Proyeksi Visual", desc: "Lihat grafik visual kapan kamu akan bebas hutang, dan berapa bunga yang bisa dihemat dengan extra payment." },
-    { icon: <MessageSquare size={24} />, title: "Asisten Keuangan AI", desc: "Tanya strategi, minta estimasi lunas, atau konsultasi soal negosiasi hutang — semua dalam chat real-time." },
+    { icon: <MessageSquare size={24} />, title: "Asisten Keuangan", desc: "Tanya strategi, minta estimasi lunas, atau konsultasi soal negosiasi hutang — semua dalam chat real-time." },
     { icon: <Bell size={24} />, title: "Pengingat Jatuh Tempo", desc: "Tidak pernah lupa bayar lagi. Notifikasi otomatis sebelum tanggal tagihan hutangmu." },
-    { icon: <ShieldCheck size={24} />, title: "Data Aman & Privasi Terjaga", desc: "Semua data dienkripsi end-to-end dengan Supabase. Hanya kamu yang bisa melihat data hutangmu." },
+    { icon: <ShieldCheck size={24} />, title: "Data Aman & Privasi Terjaga", desc: "Data kamu disimpan aman di server Supabase. Hanya kamu yang bisa mengakses akun dan data hutangmu." },
     { icon: <Zap size={24} />, title: "Catat Pembayaran Real-Time", desc: "Setiap pembayaran otomatis memotong sisa hutang. Tidak perlu hitung manual atau update spreadsheet." },
   ];
   return (
@@ -310,7 +310,7 @@ function Pricing() {
                   "Laporan & Analitik Detail",
                   "Simulasi What-If Analysis",
                   "Pengingat jatuh tempo",
-                  "Asisten Keuangan AI Priority",
+                  "Asisten Keuangan Priority",
                   "Update fitur selamanya",
                   "Support prioritas via WhatsApp",
                 ].map((f, i) => (
@@ -374,7 +374,7 @@ function Testimonials() {
 function FAQ() {
   const faqs = [
     { q: "Bagaimana cara daftar?", a: "Klik tombol 'Daftar Gratis' dan hubungi admin via WhatsApp. Admin akan membuatkan akun dan mengirimkan email + password ke kamu dalam waktu singkat." },
-    { q: "Apakah data hutang saya aman?", a: "100% aman. Data disimpan di Supabase dengan enkripsi end-to-end. Hanya kamu yang bisa melihat data hutangmu. Kami tidak menjual data ke pihak ketiga." },
+    { q: "Apakah data hutang saya aman?", a: "Data kamu disimpan aman di server Supabase yang terlindungi. Hanya kamu yang bisa mengakses akun dan data hutangmu. Kami tidak menjual data ke pihak ketiga." },
     { q: "Apa bedanya strategi Snowball, Avalanche, dan Smart Priority?", a: "Snowball: lunasi hutang terkecil dulu untuk motivasi. Avalanche: lunasi bunga tertinggi dulu untuk hemat bunga. Smart Priority: kombinasi keduanya yang direkomendasikan sistem berdasarkan profilmu." },
     { q: "Apakah PRO bayar bulanan atau sekali bayar?", a: "Sekali bayar, akses selamanya. Tidak ada langganan bulanan yang memberatkan. Bayar Rp 99.000 satu kali dan nikmati semua fitur PRO untuk selamanya." },
     { q: "Bisa dipakai untuk hutang apa saja?", a: "Bisa untuk semua jenis hutang: KTA, kartu kredit, pinjol, cicilan motor/rumah, hutang ke keluarga/teman, PayLater, dan lainnya." },
@@ -481,7 +481,7 @@ function Footer() {
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-gray-600 font-medium">© 2025 Lunasin.id. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-            <Lock size={12} /> Data kamu aman & terenkripsi
+            <Lock size={12} /> Data kamu aman di server Supabase
           </div>
         </div>
       </div>

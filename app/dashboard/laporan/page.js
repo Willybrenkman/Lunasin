@@ -5,7 +5,7 @@ import { TrendingDown, Wallet, Calendar, ChevronRight, Loader2 } from "lucide-re
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
-import { simulate } from "@/lib/calculate";
+import { simulate, getDebtHealth } from "@/lib/calculate";
 
 export default function LaporanPage() {
   const [activeTab, setActiveTab] = useState("Ringkasan");
@@ -85,18 +85,8 @@ export default function LaporanPage() {
     return Object.values(grouped).slice(-6); // Last 6 months
   })();
 
-  // Health score: progress paid off (0-70pt) + activity bonus (0-30pt)
-  const progressScore = debts.length === 0 ? 70 : (totalHutang > 0 ? Math.round((totalTerbayar / totalHutang) * 70) : 0);
-  const activityScore = payments.length >= 3 ? 30 : payments.length > 0 ? 15 : 0;
-  const healthScore = Math.min(100, progressScore + activityScore);
-
-  const getHealthLabel = (score) => {
-    if (score >= 80) return { label: "Sehat", color: "text-[#22C55E]" };
-    if (score >= 60) return { label: "Cukup Baik", color: "text-gold" };
-    if (score >= 40) return { label: "Waspada", color: "text-gold" };
-    return { label: "Perlu Perhatian", color: "text-red-400" };
-  };
-  const health = getHealthLabel(healthScore);
+  const health = getDebtHealth(debts, payments);
+  const healthScore = health.score;
 
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">

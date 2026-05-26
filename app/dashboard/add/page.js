@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Loader2, Info, Wallet, Percent, CreditCard, Calendar, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Info, Wallet, Percent, CreditCard, Calendar, CalendarCheck, CheckCircle2, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { DEBT_TYPES } from "@/lib/debtTypes";
 
 export default function AddDebt() {
+  const [debtType, setDebtType] = useState("lainnya");
   const [form, setForm] = useState({
     name: "",
     total: "",
@@ -21,6 +23,10 @@ export default function AddDebt() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+
+  const selectedType = DEBT_TYPES.find(t => t.value === debtType) || DEBT_TYPES[0];
+  const effectiveRate = form.interest ? selectedType.convert(Number(form.interest)) : null;
+  const showRatePreview = form.interest && selectedType.rateType !== "annual" && effectiveRate !== null;
 
   // Hitung durasi otomatis
   const getDurasi = () => {
@@ -55,8 +61,9 @@ export default function AddDebt() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          debt_type: debtType,
           total: Number(form.total),
-          interest: Number(form.interest),
+          interest: selectedType.convert(Number(form.interest)),
           min_payment: Number(form.min_payment),
           tanggal_mulai: form.tanggal_mulai || null,
           jatuh_tempo: form.jatuh_tempo || null,
@@ -115,33 +122,67 @@ export default function AddDebt() {
           className="bg-[#0F1319] rounded-3xl border border-white/5 p-8"
         >
           <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Debt Type Selector */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-gray-400">Jenis Hutang</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-gold transition-colors pointer-events-none">
+                  <CreditCard size={18} />
+                </div>
+                <select
+                  value={debtType}
+                  onChange={e => { setDebtType(e.target.value); setForm(f => ({ ...f, interest: "" })); }}
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-10 focus:border-gold outline-none transition-all text-white font-medium appearance-none cursor-pointer"
+                >
+                  {DEBT_TYPES.map(t => (
+                    <option key={t.value} value={t.value} className="bg-[#0F1319]">{t.label}</option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                  <ChevronDown size={16} />
+                </div>
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-2 gap-8">
-              <InputField 
-                label="Nama Hutang" 
-                placeholder="cth: Kartu Kredit BCA" 
+              <InputField
+                label="Nama Hutang"
+                placeholder="cth: Kartu Kredit BCA"
                 icon={<CreditCard size={18} />}
                 value={form.name}
                 onChange={e => setForm({...form, name: e.target.value})}
                 required
               />
-              <InputField 
-                label="Total Sisa Hutang" 
-                placeholder="cth: 5000000" 
+              <InputField
+                label="Total Sisa Hutang"
+                placeholder="cth: 5000000"
                 type="number"
                 icon={<Wallet size={18} />}
                 value={form.total}
                 onChange={e => setForm({...form, total: e.target.value})}
                 required
               />
-              <InputField 
-                label="Bunga per Tahun (%)" 
-                placeholder="cth: 12" 
-                type="number"
-                icon={<Percent size={18} />}
-                value={form.interest}
-                onChange={e => setForm({...form, interest: e.target.value})}
-                required
-              />
+              <div className="space-y-2">
+                <InputField
+                  label={selectedType.rateLabel}
+                  placeholder={selectedType.placeholder}
+                  type="number"
+                  step="any"
+                  icon={<Percent size={18} />}
+                  hint={selectedType.hint}
+                  value={form.interest}
+                  onChange={e => setForm({...form, interest: e.target.value})}
+                  required
+                />
+                {showRatePreview && (
+                  <div className="bg-gold/5 border border-gold/10 rounded-xl px-4 py-2 flex items-center gap-2">
+                    <Info size={13} className="text-gold shrink-0" />
+                    <p className="text-[11px] text-gold">
+                      = <span className="font-black">{effectiveRate.toFixed(1)}%</span> per tahun (efektif) — nilai yang disimpan ke database
+                    </p>
+                  </div>
+                )}
+              </div>
               <InputField 
                 label="Cicilan Minimum / Bulan" 
                 placeholder="cth: 500000" 
@@ -205,7 +246,7 @@ export default function AddDebt() {
             <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl flex gap-3">
               <Info className="text-blue-400 shrink-0" size={20} />
               <p className="text-sm text-blue-400 leading-relaxed">
-                Gunakan angka nominal murni tanpa titik atau koma (cth: 5000000). Data ini akan tersimpan dengan aman dan terenkripsi.
+                Gunakan angka nominal murni tanpa titik atau koma (cth: 5000000). Data tersimpan aman di server Supabase.
               </p>
             </div>
 
@@ -223,7 +264,7 @@ export default function AddDebt() {
   );
 }
 
-function InputField({ label, icon, ...props }) {
+function InputField({ label, icon, hint, ...props }) {
   return (
     <div className="space-y-3">
       <label className="text-sm font-bold text-gray-400">{label}</label>
@@ -236,6 +277,7 @@ function InputField({ label, icon, ...props }) {
           className="w-full bg-black/40 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-gold outline-none transition-all placeholder:text-gray-500 text-white font-medium"
         />
       </div>
+      {hint && <p className="text-[11px] text-gray-500 px-1">{hint}</p>}
     </div>
   );
 }

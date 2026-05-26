@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, ArrowUpRight, Loader2, X, Save, Wallet, AlertCircle } from "lucide-react";
+import { CheckCircle2, ArrowUpRight, Loader2, X, Save, Wallet, AlertCircle, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 import confetti from "canvas-confetti";
@@ -115,7 +115,7 @@ export default function Pembayaran() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form)
       });
-      
+
       if (res.ok) {
         const debtPaid = debts.find(d => d.id === form.debt_id);
         const sisaSebelumnya = Number(debtPaid?.sisa ?? debtPaid?.total ?? 0);
@@ -127,7 +127,6 @@ export default function Pembayaran() {
         setForm({ debt_id: "", amount: "", payment_date: new Date().toISOString().split('T')[0], notes: "" });
 
         if (debtPaid && amountPaid >= sisaSebelumnya && sisaSebelumnya > 0) {
-          // LUNAS! Fire Confetti!
           confetti({
             particleCount: 150,
             spread: 100,
@@ -138,9 +137,13 @@ export default function Pembayaran() {
         } else {
           setSuccessMsg("Pembayaran berhasil dicatat & saldo hutang otomatis berkurang! 🚀");
         }
-        
+
         setTimeout(() => setSuccessMsg(""), 5000);
-        fetchData(); // Reload data
+        fetchData();
+      } else {
+        const data = await res.json();
+        setErrorMsg(data.error || "Gagal menyimpan pembayaran. Coba lagi.");
+        setTimeout(() => setErrorMsg(""), 4000);
       }
     } catch (error) {
       console.error(error);
@@ -148,6 +151,27 @@ export default function Pembayaran() {
       setTimeout(() => setErrorMsg(""), 4000);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (paymentId) => {
+    if (!confirm("Hapus pembayaran ini? Sisa hutang akan dikembalikan.")) return;
+    try {
+      const res = await fetch(`/api/payments?id=${paymentId}`, { method: "DELETE" });
+      if (res.ok) {
+        sessionStorage.removeItem("debts_cache");
+        sessionStorage.removeItem("payments_cache");
+        setSuccessMsg("Pembayaran berhasil dihapus.");
+        setTimeout(() => setSuccessMsg(""), 3000);
+        fetchData();
+      } else {
+        const data = await res.json();
+        setErrorMsg(data.error || "Gagal menghapus pembayaran.");
+        setTimeout(() => setErrorMsg(""), 4000);
+      }
+    } catch (e) {
+      setErrorMsg("Gagal menghapus pembayaran. Coba lagi.");
+      setTimeout(() => setErrorMsg(""), 4000);
     }
   };
 
@@ -227,12 +251,13 @@ export default function Pembayaran() {
                 <th className="px-8 py-5 whitespace-nowrap">Jumlah Bayar</th>
                 <th className="px-8 py-5 whitespace-nowrap">Catatan</th>
                 <th className="px-8 py-5 whitespace-nowrap text-center">Status</th>
+                <th className="px-8 py-5 whitespace-nowrap text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {payments.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-16 text-center">
+                  <td colSpan={6} className="px-8 py-16 text-center">
                     <p className="text-gray-500 font-bold text-sm mb-2">Belum ada riwayat pembayaran</p>
                     <p className="text-gray-600 text-xs">Klik "Bayar Sekarang" untuk mencatat pembayaran hutangmu.</p>
                   </td>
@@ -247,6 +272,15 @@ export default function Pembayaran() {
                     <span className="inline-flex items-center gap-1.5 text-[#22C55E] font-black text-[10px] bg-[#22C55E]/10 border border-[#22C55E]/20 px-3 py-1.5 rounded-md uppercase tracking-widest">
                       <CheckCircle2 size={12} /> Berhasil
                     </span>
+                  </td>
+                  <td className="px-8 py-6 text-center">
+                    <button
+                      onClick={() => handleDelete(t.id)}
+                      className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                      title="Hapus pembayaran ini"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </td>
                 </tr>
               ))}
