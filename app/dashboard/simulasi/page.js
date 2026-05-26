@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import DebtChart from "@/components/DebtChart";
 import { useEffect, useState } from "react";
-import { calculatePlan, simulate } from "@/lib/calculate";
+import { calculatePlan, simulate, detectNonConvergent } from "@/lib/calculate";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 
@@ -16,6 +16,8 @@ export default function SimulasiPage() {
   const [extraPaymentInput, setExtraPaymentInput] = useState("500000");
   const [extraPayment, setExtraPayment] = useState(500000);
   const { formatMoney } = usePrivacy();
+
+  const nonConvergent = debts.length > 0 ? detectNonConvergent(debts) : [];
 
   useEffect(() => {
     async function fetchDebts() {
@@ -126,6 +128,23 @@ export default function SimulasiPage() {
           <h1 className="text-[28px] font-black tracking-tight text-white">Hasil Simulasi</h1>
         </div>
       </div>
+
+      {/* Non-Convergent Warning */}
+      {nonConvergent.length > 0 && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5 flex gap-4">
+          <AlertTriangle className="text-red-400 shrink-0 mt-0.5" size={20} />
+          <div>
+            <p className="font-black text-sm text-red-400 mb-2">Peringatan: Cicilan Tidak Mencukupi</p>
+            <div className="space-y-1">
+              {nonConvergent.map((d, i) => (
+                <p key={i} className="text-xs text-gray-400">
+                  <span className="font-bold text-white">{d.name}</span>: cicilan minimum {formatMoney(d.minPayment)} tidak cukup menutup bunga bulanan {formatMoney(d.monthlyInterest)}. Disarankan minimal {formatMoney(d.suggestedMin)}/bulan.
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-12 gap-8">
         
