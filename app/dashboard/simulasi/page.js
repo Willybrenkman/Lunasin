@@ -2,7 +2,7 @@
 
 import { ArrowLeft, AlertTriangle, Brain } from "lucide-react";
 import DebtChart from "@/components/DebtChart";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { calculatePlan, simulate, detectNonConvergent } from "@/lib/calculate";
 import { generateSimulasiInsight } from "@/lib/insight";
 import Link from "next/link";
@@ -19,7 +19,10 @@ export default function SimulasiPage() {
   const [extraPayment, setExtraPayment] = useState(500000);
   const { formatMoney } = usePrivacy();
 
-  const nonConvergent = debts.length > 0 ? detectNonConvergent(debts) : [];
+  const nonConvergent = useMemo(() =>
+    debts.length > 0 ? detectNonConvergent(debts) : [],
+    [debts]
+  );
 
   useEffect(() => {
     async function fetchDebts() {
@@ -52,13 +55,18 @@ export default function SimulasiPage() {
     }
   }, [strategy, debts, extraPayment]);
 
-  const totalMinPayment = debts
-    .filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
-    .reduce((s, d) => s + Number(d.min_payment || 0), 0);
-  const estimasiBulan = chartData.filter(d => d.total > 0).length || 0;
+  const totalMinPayment = useMemo(() =>
+    debts.filter(d => Number(d.sisa ?? d.total ?? 0) > 0)
+      .reduce((s, d) => s + Number(d.min_payment || 0), 0),
+    [debts]
+  );
 
-  // Semua kalkulasi simulasi dalam satu blok — baseline dihitung SEKALI dan di-reuse
-  const { simResult, simulasiInsight, whatIfData } = (() => {
+  const estimasiBulan = useMemo(() =>
+    chartData.filter(d => d.total > 0).length || 0,
+    [chartData]
+  );
+
+  const { simResult, simulasiInsight, whatIfData } = useMemo(() => {
     if (debts.length === 0) return { simResult: { months: 0, totalInterest: 0 }, simulasiInsight: "", whatIfData: [] };
 
     const stratKey = strategy.toLowerCase();
@@ -103,7 +111,7 @@ export default function SimulasiPage() {
         isCurrent: row.extra === extraPayment,
       })),
     };
-  })();
+  }, [debts, strategy, extraPayment, formatMoney]);
 
   if (loading) return (
     <div className="h-[60vh] flex items-center justify-center">
@@ -293,13 +301,13 @@ export default function SimulasiPage() {
   );
 }
 
-function StrategyOption({ active, onClick, title, desc }) {
+function StrategyOption({ active, onClick, title, desc, pro }) {
   return (
-    <div 
+    <div
       onClick={onClick}
       className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer ${
-        active 
-          ? "border-[#22C55E] bg-[#22C55E]/5" 
+        active
+          ? "border-[#22C55E] bg-[#22C55E]/5"
           : "border-white/5 bg-black/20 hover:border-white/10"
       }`}
     >
@@ -310,6 +318,7 @@ function StrategyOption({ active, onClick, title, desc }) {
         <div>
           <div className="flex items-center gap-2">
             <p className="font-bold text-sm text-white">{title}</p>
+            {pro && <span className="bg-[#D4AF37] text-black text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Rekomendasi</span>}
           </div>
           <p className="text-[10px] font-medium text-gray-500 mt-0.5">{desc}</p>
         </div>
