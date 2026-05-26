@@ -57,7 +57,10 @@ export default function SimulasiPage() {
     .reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
 
-  const extraAmounts = [0, 250000, 500000, 1000000, 1500000];
+  const round10k = (n) => Math.round(n / 10000) * 10000;
+  const extraAmounts = extraPayment > 0
+    ? [0, round10k(extraPayment * 0.25), round10k(extraPayment * 0.5), extraPayment, round10k(extraPayment * 2)]
+    : [0, 250000, 500000, 1000000, 1500000];
 
   const whatIfData = (() => {
     if (debts.length === 0) return [];
@@ -88,6 +91,7 @@ export default function SimulasiPage() {
       totalInterest: formatMoney(row.totalInterest),
       savings: formatMoney(row.rawSavings),
       status: idx === optimalIdx ? "Optimal" : "",
+      isCurrent: row.extra === extraPayment,
     }));
   })();
 
@@ -243,8 +247,11 @@ export default function SimulasiPage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {whatIfData.map((row, idx) => (
-                    <tr key={idx} className={`group hover:bg-[#ffffff]/[0.02] transition-colors ${row.status ? 'bg-[#22C55E]/[0.05] border-l-4 border-[#22C55E]' : 'border-l-4 border-transparent'}`}>
-                      <td className="px-10 py-6 font-bold text-white text-sm">{row.extra}</td>
+                    <tr key={idx} className={`group hover:bg-[#ffffff]/[0.02] transition-colors ${row.status ? 'bg-[#22C55E]/[0.05] border-l-4 border-[#22C55E]' : row.isCurrent ? 'bg-[#D4AF37]/[0.05] border-l-4 border-[#D4AF37]' : 'border-l-4 border-transparent'}`}>
+                      <td className="px-10 py-6 font-bold text-white text-sm">
+                        {row.extra}
+                        {row.isCurrent && <span className="ml-2 bg-[#D4AF37] text-black text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">Saat ini</span>}
+                      </td>
                       <td className="px-10 py-6 font-medium text-gray-400 text-sm">{row.months}</td>
                       <td className="px-10 py-6 font-medium text-gray-400 text-sm">{row.totalInterest}</td>
                       <td className="px-10 py-6 font-black text-[#22C55E] text-sm">{row.savings}</td>
