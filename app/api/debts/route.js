@@ -52,7 +52,7 @@ export async function POST(req) {
           min_payment: Number(min_payment),
           tanggal_mulai: tanggal_mulai || null,
           jatuh_tempo: jatuh_tempo || null,
-          tanggal_tagihan: tanggal_tagihan ? Number(tanggal_tagihan) : null,
+          tanggal_tagihan: tanggal_tagihan ? Math.min(28, Number(tanggal_tagihan)) : null,
           notes
         }
       ]).select();
@@ -90,7 +90,7 @@ export async function PUT(req) {
       min_payment: Number(min_payment),
       tanggal_mulai: tanggal_mulai || null,
       jatuh_tempo: jatuh_tempo || null,
-      tanggal_tagihan: tanggal_tagihan ? Number(tanggal_tagihan) : null,
+      tanggal_tagihan: tanggal_tagihan ? Math.min(28, Number(tanggal_tagihan)) : null,
       status,
       notes
     };

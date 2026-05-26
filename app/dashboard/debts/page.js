@@ -86,6 +86,9 @@ export default function DebtsPage() {
   };
 
   const openEditModal = (debt) => {
+    const typeConfig = getDebtTypeConfig(debt.debt_type || "lainnya");
+    // Reverse-convert stored annual effective rate back to the display format of the debt type
+    const displayRate = typeConfig.reverseConvert(Number(debt.interest));
     setEditModal({
       isOpen: true,
       data: {
@@ -94,7 +97,7 @@ export default function DebtsPage() {
         debt_type: debt.debt_type || "lainnya",
         total: debt.total,
         sisa: debt.sisa,
-        interest: debt.interest,
+        interestDisplay: displayRate,
         min_payment: debt.min_payment,
         status: debt.status,
         tanggal_mulai: debt.tanggal_mulai ? debt.tanggal_mulai.slice(0, 10) : "",
@@ -118,7 +121,7 @@ export default function DebtsPage() {
           debt_type: editModal.data.debt_type,
           total: Number(editModal.data.total),
           sisa: Number(editModal.data.sisa),
-          interest: Number(editModal.data.interest),
+          interest: getDebtTypeConfig(editModal.data.debt_type).convert(Number(editModal.data.interestDisplay)),
           min_payment: Number(editModal.data.min_payment),
           status: editModal.data.status,
           tanggal_mulai: editModal.data.tanggal_mulai || null,
@@ -156,8 +159,8 @@ export default function DebtsPage() {
         return ad - bd;
       }
       case "progress": {
-        const ap = Number(a.total) > 0 ? (Number(a.total) - Number(a.sisa ?? a.total)) / Number(a.total) : 0;
-        const bp = Number(b.total) > 0 ? (Number(b.total) - Number(b.sisa ?? b.total)) / Number(b.total) : 0;
+        const ap = Number(a.total) > 0 ? Math.max(0, Math.min(1, (Number(a.total) - Number(a.sisa ?? a.total)) / Number(a.total))) : 0;
+        const bp = Number(b.total) > 0 ? Math.max(0, Math.min(1, (Number(b.total) - Number(b.sisa ?? b.total)) / Number(b.total))) : 0;
         return bp - ap;
       }
       default: return 0;
@@ -394,7 +397,10 @@ export default function DebtsPage() {
                 <div className="relative">
                   <select
                     value={editModal.data.debt_type}
-                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, debt_type: e.target.value}}))}
+                    onChange={e => {
+                      const t = DEBT_TYPES.find(d => d.value === e.target.value);
+                      setEditModal(prev => ({...prev, data: {...prev.data, debt_type: e.target.value, interestDisplay: t?.defaultRate?.toString() ?? "0"}}));
+                    }}
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors appearance-none cursor-pointer"
                   >
                     {DEBT_TYPES.map(t => (
@@ -439,40 +445,58 @@ export default function DebtsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Bunga / Tahun (% Efektif)</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={editModal.data.interest}
-                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, interest: e.target.value}}))}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Cicilan Minimum</label>
-                  <input
-                    type="number"
-                    value={editModal.data.min_payment}
-                    onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, min_payment: e.target.value}}))}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
-                    required
-                  />
-                </div>
-              </div>
+              {(() => {
+                const tc = getDebtTypeConfig(editModal.data.debt_type);
+                const annualRate = tc.convert(Number(editModal.data.interestDisplay));
+                const monthlyInterest = Number(editModal.data.sisa) * (annualRate / 100 / 12);
+                const isNonConvergent = Number(editModal.data.min_payment) > 0 && Number(editModal.data.min_payment) <= monthlyInterest;
+                return (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">{tc.rateLabel}</label>
+                        <input
+                          type="number"
+                          step="any"
+                          value={editModal.data.interestDisplay}
+                          onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, interestDisplay: e.target.value}}))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                          required
+                        />
+                        {tc.hint && <p className="text-[11px] text-gray-500 mt-1">{tc.hint}</p>}
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Cicilan Minimum</label>
+                        <input
+                          type="number"
+                          value={editModal.data.min_payment}
+                          onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, min_payment: e.target.value}}))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+                    {isNonConvergent && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex gap-2 items-start">
+                        <AlertCircle size={14} className="text-red-400 shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-400">Cicilan minimum lebih kecil dari bunga bulanan ({Math.round(monthlyInterest).toLocaleString("id-ID")}/bln). Hutang ini tidak akan pernah lunas — tambah cicilan minimum.</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Tgl Tagihan Bulanan (1–31)</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block">Tgl Tagihan Bulanan (1–28)</label>
                 <input
                   type="number"
-                  min="1" max="31"
+                  min="1" max="28"
                   placeholder="Contoh: 25"
                   value={editModal.data.tanggal_tagihan || ""}
                   onChange={e => setEditModal(prev => ({...prev, data: {...prev.data, tanggal_tagihan: e.target.value}}))}
                   className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-gold transition-colors"
                 />
+                <p className="text-[11px] text-gray-500 mt-1">Maks 28 agar valid di semua bulan termasuk Februari.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
