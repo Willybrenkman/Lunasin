@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [insight, setInsight] = useState("");
   const [recommendationMsg, setRecommendationMsg] = useState("");
   const [achievements, setAchievements] = useState([]);
+  const [simMonths, setSimMonths] = useState(0);
   const [shareModal, setShareModal] = useState(false);
   const [waNumber, setWaNumber] = useState("");
   const { formatMoney } = usePrivacy();
@@ -65,6 +66,7 @@ export default function Dashboard() {
       setChartData(plan);
       const strategyForSim = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
       const simSummary = simulate(debts, strategyForSim, extraPayment);
+      setSimMonths(simSummary.months);
       setInsight(generateInsight({ months: simSummary.months, totalInterest: simSummary.totalInterest, extraPayment, strategy }));
       setRecommendationMsg(recommend(debts));
 
@@ -132,7 +134,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard label="Total Hutang" tooltip="Jumlah semua hutang awal yang pernah kamu catat, sebelum ada pembayaran apapun." value={formatMoney(totalHutang)} sub={`${debts.length} hutang aktif`} icon={<Wallet size={20} />} color="text-purple-400" bgColor="bg-purple-500/10" />
         <StatCard label="Sisa Hutang" tooltip="Total hutang yang belum terbayar sampai hari ini. Angka ini berkurang setiap kamu mencatat pembayaran." value={formatMoney(sisaHutang)} sub={totalHutang > 0 ? `${((sisaHutang / totalHutang) * 100).toFixed(1)}% dari total` : "0%"} icon={<BarChart3 size={20} />} color="text-green-400" bgColor="bg-green-500/10" />
-        <StatCard label="Estimasi Lunas" tooltip="Proyeksi berapa bulan lagi kamu bebas hutang, dihitung berdasarkan strategi dan extra payment yang dipilih. Bukan angka pasti — berubah sesuai simulasimu." value={chartData.length > 0 ? `${chartData.filter(d => d.total > 0).length} bulan` : "-"} sub="" icon={<Calendar size={20} />} color="text-blue-400" bgColor="bg-blue-500/10" />
+        <StatCard label="Estimasi Lunas" tooltip="Proyeksi berapa bulan lagi kamu bebas hutang, dihitung berdasarkan strategi dan extra payment yang dipilih. Bukan angka pasti — berubah sesuai simulasimu." value={simMonths > 0 ? `${simMonths} bulan` : "-"} sub="" icon={<Calendar size={20} />} color="text-blue-400" bgColor="bg-blue-500/10" />
 
         {/* Progress Card */}
         <div className="luxury-card rounded-3xl p-6 transition-all group">

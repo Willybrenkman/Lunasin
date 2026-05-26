@@ -61,11 +61,6 @@ export default function SimulasiPage() {
     [debts]
   );
 
-  const estimasiBulan = useMemo(() =>
-    chartData.filter(d => d.total > 0).length || 0,
-    [chartData]
-  );
-
   const { simResult, simulasiInsight, whatIfData } = useMemo(() => {
     if (debts.length === 0) return { simResult: { months: 0, totalInterest: 0 }, simulasiInsight: "", whatIfData: [] };
 
@@ -226,7 +221,7 @@ export default function SimulasiPage() {
             <div className="grid md:grid-cols-3 gap-6 mb-8">
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 flex items-center">Estimasi Bebas Hutang <Tooltip text="Proyeksi berapa bulan lagi semua hutangmu lunas dengan strategi dan extra payment yang dipilih. Berubah otomatis saat kamu ganti strategi atau extra payment." /></p>
-                 <p className="font-black text-white text-lg">{estimasiBulan > 0 ? `${estimasiBulan} bulan` : "-"}</p>
+                 <p className="font-black text-white text-lg">{simResult.months > 0 ? `${simResult.months} bulan` : "-"}</p>
                </div>
                <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 flex items-center">Total Bunga Terhitung <Tooltip text="Total bunga yang akan kamu bayar dari sekarang sampai lunas. Semakin besar extra payment atau semakin baik strateginya, angka ini makin kecil." /></p>
