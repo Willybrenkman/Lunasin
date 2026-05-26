@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { generateInsight } from "@/lib/insight";
+import { simulate } from "@/lib/calculate";
 import { recommend } from "@/lib/recommendation";
 import { getAchievements } from "@/lib/achievement";
 import DebtCalendar from "@/components/DebtCalendar";
@@ -61,7 +62,9 @@ export default function Dashboard() {
       const strategyKey = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
       const plan = calculatePlan(debts, strategyKey, extraPayment);
       setChartData(plan);
-      setInsight(generateInsight({ months: plan.length, totalInterest: plan.reduce((s, p) => s + p.total, 0) }));
+      const strategyForSim = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
+      const simSummary = simulate(debts, strategyForSim, extraPayment);
+      setInsight(generateInsight({ months: simSummary.months, totalInterest: simSummary.totalInterest, extraPayment, strategy }));
       setRecommendationMsg(recommend(debts));
 
       const totalAwal = debts.reduce((s, d) => s + Number(d.total || 0), 0);

@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Brain } from "lucide-react";
 import DebtChart from "@/components/DebtChart";
 import { useEffect, useState } from "react";
 import { calculatePlan, simulate, detectNonConvergent } from "@/lib/calculate";
+import { generateSimulasiInsight } from "@/lib/insight";
 import Link from "next/link";
 import { usePrivacy } from "@/components/privacy/PrivacyContext";
 
@@ -56,6 +57,15 @@ export default function SimulasiPage() {
     .reduce((s, d) => s + Number(d.min_payment || 0), 0);
   const estimasiBulan = chartData.length || 0;
   const simResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), extraPayment) : { months: 0, totalInterest: 0 };
+  const baselineResult = debts.length > 0 ? simulate(debts, strategy.toLowerCase(), 0) : { months: 0, totalInterest: 0 };
+  const simulasiInsight = debts.length > 0 ? generateSimulasiInsight({
+    months: simResult.months,
+    totalInterest: simResult.totalInterest,
+    baselineMonths: baselineResult.months,
+    baselineInterest: baselineResult.totalInterest,
+    extraPayment,
+    strategy,
+  }) : "";
 
   const round10k = (n) => Math.round(n / 10000) * 10000;
   const extraAmounts = extraPayment > 0
@@ -222,6 +232,13 @@ export default function SimulasiPage() {
                </div>
             </div>
             
+            {simulasiInsight && (
+              <div className="bg-[#22C55E]/10 border border-[#22C55E]/20 rounded-2xl p-5 mb-6 flex gap-3">
+                <Brain size={16} className="text-[#22C55E] shrink-0 mt-0.5" />
+                <p className="text-xs text-gray-300 font-medium leading-relaxed">{simulasiInsight}</p>
+              </div>
+            )}
+
             <div className="h-[400px]">
                <DebtChart data={chartData} strategy={strategy} onStrategyChange={setStrategy} />
             </div>
