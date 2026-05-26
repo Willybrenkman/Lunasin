@@ -73,6 +73,7 @@ export default function DebtsPage() {
       const response = await fetch(`/api/debts?id=${id}`, { method: "DELETE" });
       if (response.ok) {
         sessionStorage.removeItem("debts_cache");
+        sessionStorage.removeItem("payments_cache");
         showSuccess("Hutang berhasil dihapus!");
         setDebts(debts.filter(d => d.id !== id));
       } else {

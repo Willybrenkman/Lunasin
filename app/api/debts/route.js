@@ -1,5 +1,9 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
+import { DEBT_TYPES } from "@/lib/debtTypes";
+
+const VALID_DEBT_TYPES = DEBT_TYPES.map(t => t.value);
+const VALID_STATUSES = ["active", "paid_off"];
 
 export async function GET() {
   const supabase = await createSupabaseServerClient();
@@ -37,7 +41,8 @@ export async function POST(req) {
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
     if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
-    if (Number(interest) < 0 || Number(interest) > 200) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
+    if (Number(interest) < 0 || Number(interest) > 1000) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
+    if (debt_type && !VALID_DEBT_TYPES.includes(debt_type)) return NextResponse.json({ error: "Jenis hutang tidak valid." }, { status: 400 });
 
     const { data, error } = await supabase
       .from("debts")
@@ -52,7 +57,7 @@ export async function POST(req) {
           min_payment: Number(min_payment),
           tanggal_mulai: tanggal_mulai || null,
           jatuh_tempo: jatuh_tempo || null,
-          tanggal_tagihan: tanggal_tagihan ? Math.min(28, Number(tanggal_tagihan)) : null,
+          tanggal_tagihan: tanggal_tagihan ? Math.max(1, Math.min(28, Number(tanggal_tagihan))) : null,
           notes
         }
       ]).select();
@@ -77,9 +82,11 @@ export async function PUT(req) {
 
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
-    if (Number(sisa) < 0 || Number(sisa) > Number(total)) return NextResponse.json({ error: "Sisa hutang tidak valid." }, { status: 400 });
+    if (Number(sisa) < 0 || Number(sisa) > Number(total)) return NextResponse.json({ error: "Sisa hutang tidak valid (harus antara 0 dan total hutang)." }, { status: 400 });
     if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
-    if (Number(interest) < 0 || Number(interest) > 200) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
+    if (Number(interest) < 0 || Number(interest) > 1000) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
+    if (debt_type && !VALID_DEBT_TYPES.includes(debt_type)) return NextResponse.json({ error: "Jenis hutang tidak valid." }, { status: 400 });
+    if (status && !VALID_STATUSES.includes(status)) return NextResponse.json({ error: "Status tidak valid." }, { status: 400 });
 
     const updateData = {
       name,
@@ -90,7 +97,7 @@ export async function PUT(req) {
       min_payment: Number(min_payment),
       tanggal_mulai: tanggal_mulai || null,
       jatuh_tempo: jatuh_tempo || null,
-      tanggal_tagihan: tanggal_tagihan ? Math.min(28, Number(tanggal_tagihan)) : null,
+      tanggal_tagihan: tanggal_tagihan ? Math.max(1, Math.min(28, Number(tanggal_tagihan))) : null,
       status,
       notes
     };

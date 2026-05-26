@@ -4,11 +4,19 @@ import { CalendarDays, AlertCircle } from "lucide-react";
 import { getUpcomingDebts } from "@/lib/reminder";
 
 export default function DebtCalendar({ debts }) {
-  const stored = typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("pengingat_settings") || "{}")
-    : {};
+  let stored = {};
+  try {
+    stored = typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("pengingat_settings") || "{}")
+      : {};
+  } catch {}
   const days = parseInt(stored.reminderDays) || 3;
   const upcoming = getUpcomingDebts(debts, days);
+
+  // Hanya tampilkan hutang yang punya jadwal tagihan, sorted by day
+  const withSchedule = [...debts]
+    .filter(d => d.tanggal_tagihan)
+    .sort((a, b) => Number(a.tanggal_tagihan) - Number(b.tanggal_tagihan));
 
   return (
     <div className="luxury-card rounded-[2rem] p-8 h-full">
@@ -27,15 +35,33 @@ export default function DebtCalendar({ debts }) {
       </div>
 
       <div className="space-y-3 mt-6">
-        {debts.map((d, i) => (
-          <div key={i} className="flex justify-between items-center p-4 bg-black/20 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-            <div className="flex items-center gap-3">
-               <div className="w-2 h-2 rounded-full bg-gold"></div>
-               <span className="font-bold text-sm text-white">{d.name}</span>
+        {withSchedule.length === 0 ? (
+          <p className="text-gray-600 text-sm font-medium text-center py-4">Belum ada jadwal tagihan.</p>
+        ) : withSchedule.map((d, i) => {
+          const isUpcoming = upcoming.some(u => u.id === d.id);
+          return (
+            <div
+              key={i}
+              className={`flex justify-between items-center p-4 rounded-2xl border transition-colors ${
+                isUpcoming
+                  ? "bg-red-500/5 border-red-500/20"
+                  : "bg-black/20 border-white/5 hover:border-white/10"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-2 h-2 rounded-full ${isUpcoming ? "bg-red-400" : "bg-gold"}`} />
+                <span className="font-bold text-sm text-white">{d.name}</span>
+              </div>
+              <span className={`text-[11px] font-medium px-3 py-1.5 rounded-lg border ${
+                isUpcoming
+                  ? "bg-red-500/10 text-red-400 border-red-500/20"
+                  : "bg-[#06080C] text-gray-400 border-white/5"
+              }`}>
+                Tgl {d.tanggal_tagihan}
+              </span>
             </div>
-            <span className="text-[11px] font-medium text-gray-400 bg-[#06080C] px-3 py-1.5 rounded-lg border border-white/5">{d.tanggal_tagihan ? `Tgl ${d.tanggal_tagihan}` : '-'}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

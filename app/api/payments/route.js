@@ -14,14 +14,19 @@ export async function POST(req) {
     if (Number(amount) <= 0) return NextResponse.json({ error: "Jumlah pembayaran harus lebih dari 0." }, { status: 400 });
     if (!debt_id) return NextResponse.json({ error: "Hutang tidak valid." }, { status: 400 });
 
-    // Pastikan debt_id milik user yang login (cegah manipulasi hutang orang lain)
+    // Pastikan debt_id milik user yang login + ambil sisa untuk validasi amount
     const { data: debtCheck } = await supabase
       .from("debts")
-      .select("id")
+      .select("id, sisa, total")
       .eq("id", debt_id)
       .eq("user_id", user.id)
       .single();
     if (!debtCheck) return NextResponse.json({ error: "Hutang tidak ditemukan." }, { status: 404 });
+
+    const sisaDebt = Number(debtCheck.sisa ?? debtCheck.total ?? 0);
+    if (sisaDebt > 0 && Number(amount) > sisaDebt) {
+      return NextResponse.json({ error: `Jumlah melebihi sisa hutang (Rp ${sisaDebt.toLocaleString("id-ID")}).` }, { status: 400 });
+    }
 
     // 1. Catat ke tabel payments
     const { data: payment, error: paymentError } = await supabase

@@ -51,13 +51,13 @@ export default function Pengaturan() {
           setEditName(profileData.display_name || "");
         }
 
-        // Load voucher info
+        // Load voucher info (maybeSingle agar tidak error kalau tidak ada)
         const { data: voucherData } = await supabase
           .from("vouchers")
           .select("code, used_at")
           .eq("claimed_email", (user.email || "").toLowerCase())
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (voucherData) {
           setVoucherCode(voucherData.code);

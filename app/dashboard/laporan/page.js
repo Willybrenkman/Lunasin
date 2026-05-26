@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { TrendingDown, Wallet, Calendar, ChevronRight, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from "@/lib/supabase";
@@ -38,10 +38,10 @@ export default function LaporanPage() {
           sessionStorage.setItem("debts_cache", JSON.stringify(debtsData));
         }
 
-        // Fetch payments (last 6 months)
+        // Fetch payments with debt name join
         const { data: paymentsData } = await supabase
           .from("payments")
-          .select("*")
+          .select("*, debts(name)")
           .eq("user_id", user.id)
           .order("payment_date", { ascending: true });
         if (paymentsData) {
@@ -64,25 +64,29 @@ export default function LaporanPage() {
   const penurunanPctRaw = totalHutang > 0 ? (totalTerbayar / totalHutang) * 100 : 0;
   const penurunanPct = Math.max(0, Math.min(100, penurunanPctRaw)).toFixed(1);
   const totalMinPayment = debts.filter(d => Number(d.sisa ?? d.total ?? 0) > 0).reduce((s, d) => s + Number(d.min_payment || 0), 0);
-  const avgInterest = debts.length > 0 ? debts.reduce((s, d) => s + Number(d.interest || 0), 0) / debts.length : 0;
-  const simResult = debts.length > 0 ? simulate(debts, "smart priority", 0) : { months: 0, totalInterest: 0 };
+  const activeDebts = debts.filter(d => Number(d.sisa ?? d.total ?? 0) > 0);
+  const avgInterest = activeDebts.length > 0 ? activeDebts.reduce((s, d) => s + Number(d.interest || 0), 0) / activeDebts.length : 0;
+  const simResult = useMemo(() =>
+    debts.length > 0 ? simulate(debts, "smart priority", 0) : { months: 0, totalInterest: 0 },
+  [debts]);
   const estimasiBulan = simResult.months;
   const estTotalBunga = simResult.totalInterest;
   const totalPaid = payments.reduce((s, p) => s + Number(p.amount || 0), 0);
 
-  // Build chart data from payments grouped by month
+  // Build chart data from payments grouped by month, sorted chronologically
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const chartData = (() => {
     if (payments.length === 0) return [];
     const grouped = {};
     payments.forEach(p => {
       const d = new Date(p.payment_date);
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
-      const label = monthNames[d.getMonth()];
+      const year = d.getFullYear();
+      const key = `${year}-${String(d.getMonth()).padStart(2, '0')}`;
+      const label = `${monthNames[d.getMonth()]} '${String(year).slice(2)}`;
       if (!grouped[key]) grouped[key] = { name: label, amount: 0 };
       grouped[key].amount += Number(p.amount || 0);
     });
-    return Object.values(grouped).slice(-6); // Last 6 months
+    return Object.keys(grouped).sort().slice(-6).map(k => grouped[k]);
   })();
 
   const health = getDebtHealth(debts, payments);

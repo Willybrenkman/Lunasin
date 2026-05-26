@@ -355,7 +355,7 @@ export default function Dashboard() {
               <button
                 onClick={() => {
                   if (!waNumber) return;
-                  const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : `62${waNumber}`;
+                  const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : waNumber.startsWith("62") ? waNumber : `62${waNumber}`;
                   const pesan = `📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`;
                   window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
                   setShareModal(false);
