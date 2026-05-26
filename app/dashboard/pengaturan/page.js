@@ -73,6 +73,7 @@ export default function Pengaturan() {
 
   const handleSaveProfile = async () => {
     if (!editName.trim()) return;
+    if (editName.trim().length > 50) return;
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -129,27 +130,31 @@ export default function Pengaturan() {
         </div>
         <div className="flex-1">
           {editMode ? (
-            <div className="flex items-center gap-3 mb-2">
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-lg font-black text-white outline-none focus:border-gold transition-colors w-full max-w-xs"
-                autoFocus
-              />
-              <button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="p-2 rounded-xl bg-[#22C55E]/10 text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors"
-              >
-                {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-              </button>
-              <button
-                onClick={() => { setEditMode(false); setEditName(profile.display_name); }}
-                className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-              >
-                <X size={18} />
-              </button>
+            <div className="mb-2">
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  maxLength={50}
+                  className="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-lg font-black text-white outline-none focus:border-gold transition-colors w-full max-w-xs"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={saving || editName.trim().length > 50}
+                  className="p-2 rounded-xl bg-[#22C55E]/10 text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors disabled:opacity-40"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
+                </button>
+                <button
+                  onClick={() => { setEditMode(false); setEditName(profile.display_name); }}
+                  className="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1 ml-1">{editName.trim().length}/50 karakter</p>
             </div>
           ) : (
             <h2 className="text-2xl font-black text-white">{profile.display_name}</h2>

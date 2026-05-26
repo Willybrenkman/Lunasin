@@ -111,6 +111,14 @@ export default function DebtsPage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    if (editModal.data.sisa === "" || editModal.data.sisa === null || editModal.data.sisa === undefined) {
+      showError("Sisa hutang tidak boleh kosong.");
+      return;
+    }
+    if (editModal.data.interestDisplay === "" || editModal.data.interestDisplay === null || editModal.data.interestDisplay === undefined) {
+      showError("Bunga tidak boleh kosong.");
+      return;
+    }
     setIsSaving(true);
     try {
       const response = await fetch("/api/debts", {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { calculatePlan } from "@/lib/calculate";
 const DebtChart = dynamic(() => import("@/components/DebtChart"), { ssr: false });
@@ -25,16 +25,46 @@ export default function Dashboard() {
   const [extraPayment, setExtraPayment] = useState(500000);
   const [extraPaymentInput, setExtraPaymentInput] = useState("500000");
   const [editingExtra, setEditingExtra] = useState(false);
-  const [chartData, setChartData] = useState([]);
   const [strategy, setStrategy] = useState("Smart Priority");
-  const [insight, setInsight] = useState("");
-  const [recommendationMsg, setRecommendationMsg] = useState("");
-  const [achievements, setAchievements] = useState([]);
-  const [simMonths, setSimMonths] = useState(0);
-  const [nonConvergent, setNonConvergent] = useState([]);
   const [shareModal, setShareModal] = useState(false);
   const [waNumber, setWaNumber] = useState("");
   const { formatMoney } = usePrivacy();
+
+  const strategyKey = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
+
+  const chartData = useMemo(() =>
+    debts.length > 0 ? calculatePlan(debts, strategyKey, extraPayment) : [],
+    [debts, strategyKey, extraPayment]
+  );
+
+  const simSummary = useMemo(() =>
+    debts.length > 0 ? simulate(debts, strategyKey, extraPayment) : { months: 0, totalInterest: 0 },
+    [debts, strategyKey, extraPayment]
+  );
+
+  const simMonths = simSummary.months;
+
+  const insight = useMemo(() =>
+    generateInsight({ months: simSummary.months, totalInterest: simSummary.totalInterest, extraPayment, strategy }),
+    [simSummary.months, simSummary.totalInterest, extraPayment, strategy]
+  );
+
+  const recommendationMsg = useMemo(() => recommend(debts), [debts]);
+  const nonConvergent = useMemo(() => detectNonConvergent(debts), [debts]);
+
+  const achievements = useMemo(() => {
+    if (debts.length === 0) return getAchievements({ paidOff: 0, progress: 0 });
+    const totalAwal = debts.reduce((s, d) => s + Number(d.total || 0), 0);
+    const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
+    const progressRaw = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
+    const progress = Math.max(0, Math.min(100, progressRaw));
+    const paidOff = debts.filter(d => {
+      const isPaidStatus = d.status === 'paid_off';
+      const isSisaZero = d.sisa !== null && d.sisa !== undefined && Number(d.sisa) <= 0 && Number(d.total) > 0;
+      return isPaidStatus || isSisaZero;
+    }).length;
+    return getAchievements({ paidOff, progress });
+  }, [debts]);
 
   // Fetch data sekali saat mount
   useEffect(() => {
@@ -59,34 +89,6 @@ export default function Dashboard() {
     }
     fetchData();
   }, []);
-
-  // Hitung ulang chart setiap kali debts, strategy, atau extraPayment berubah
-  useEffect(() => {
-    if (debts.length > 0) {
-      const strategyKey = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
-      const plan = calculatePlan(debts, strategyKey, extraPayment);
-      setChartData(plan);
-      const strategyForSim = strategy === "Smart Priority" ? "smart priority" : strategy.toLowerCase();
-      const simSummary = simulate(debts, strategyForSim, extraPayment);
-      setSimMonths(simSummary.months);
-      setInsight(generateInsight({ months: simSummary.months, totalInterest: simSummary.totalInterest, extraPayment, strategy }));
-      setRecommendationMsg(recommend(debts));
-      setNonConvergent(detectNonConvergent(debts));
-
-      const totalAwal = debts.reduce((s, d) => s + Number(d.total || 0), 0);
-      const totalSisa = debts.reduce((s, d) => s + Number(d.sisa ?? d.total ?? 0), 0);
-      const progressRaw = totalAwal > 0 ? Math.round(((totalAwal - totalSisa) / totalAwal) * 100) : 0;
-      const progress = Math.max(0, Math.min(100, progressRaw));
-      const paidOff = debts.filter(d => {
-        const isPaidStatus = d.status === 'paid_off';
-        const isSisaZero = d.sisa !== null && d.sisa !== undefined && Number(d.sisa) <= 0 && Number(d.total) > 0;
-        return isPaidStatus || isSisaZero;
-      }).length;
-      setAchievements(getAchievements({ paidOff, progress }));
-    } else {
-      setAchievements(getAchievements({ paidOff: 0, progress: 0 }));
-    }
-  }, [strategy, debts, extraPayment]);
 
   if (loading) return (
     <div className="space-y-8 animate-pulse">

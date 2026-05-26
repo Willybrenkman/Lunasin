@@ -28,11 +28,11 @@ function analyzeDebts(debts) {
 
   const highestInterest = activeDebts.length > 0
     ? activeDebts.reduce((max, d) => Number(d.interest || 0) > Number(max.interest || 0) ? d : max, activeDebts[0])
-    : debts[0];
+    : null;
 
   const smallestDebt = activeDebts.length > 0
     ? activeDebts.reduce((min, d) => Number(d.sisa || d.total || 0) < Number(min.sisa || min.total || 0) ? d : min, activeDebts[0])
-    : debts[0];
+    : null;
 
   return { totalSisa, totalMin, highestInterest, smallestDebt, activeDebts, paidOff, avgInterest };
 }
@@ -344,6 +344,13 @@ function generateResponse(message, debts) {
 export async function POST(req) {
   try {
     const { message } = await req.json();
+
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      return NextResponse.json({ error: "Pesan tidak boleh kosong." }, { status: 400 });
+    }
+    if (message.length > 1000) {
+      return NextResponse.json({ error: "Pesan terlalu panjang (maks 1000 karakter)." }, { status: 400 });
+    }
 
     const supabase = await createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
