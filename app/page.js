@@ -287,7 +287,7 @@ function Pricing() {
                   <Crown size={10} /> Terpopuler
                 </span>
               </div>
-              <p className="text-5xl font-black mb-1 text-gold">Rp 99.000</p>
+              <p className="text-5xl font-black mb-1 text-gold">Rp 129.000</p>
               <div className="flex items-center gap-2 mb-8">
                 <Infinity size={16} className="text-gold" />
                 <p className="text-gray-400 text-sm font-bold">Bayar sekali, akses selamanya</p>
@@ -310,7 +310,7 @@ function Pricing() {
               </ul>
               <a href={WA_LINK} target="_blank" rel="noopener noreferrer">
                 <button className="w-full py-4 rounded-2xl bg-gold text-black font-black text-sm hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-gold/20">
-                  Upgrade ke PRO — Rp 99.000
+                  Upgrade ke PRO — Rp 129.000
                 </button>
               </a>
               <p className="text-center text-[11px] text-gray-500 mt-3 font-medium">Pembayaran via transfer bank / e-wallet</p>
@@ -365,7 +365,7 @@ function FAQ() {
     { q: "Bagaimana cara daftar?", a: "Klik tombol 'Daftar Gratis' dan hubungi admin via WhatsApp. Admin akan membuatkan akun dan mengirimkan email + password ke kamu dalam waktu singkat." },
     { q: "Apakah data hutang saya aman?", a: "Data kamu disimpan aman di server Supabase yang terlindungi. Hanya kamu yang bisa mengakses akun dan data hutangmu. Kami tidak menjual data ke pihak ketiga." },
     { q: "Apa bedanya strategi Snowball, Avalanche, dan Smart Priority?", a: "Snowball: lunasi hutang terkecil dulu untuk motivasi. Avalanche: lunasi bunga tertinggi dulu untuk hemat bunga. Smart Priority: kombinasi keduanya yang direkomendasikan sistem berdasarkan profilmu." },
-    { q: "Apakah PRO bayar bulanan atau sekali bayar?", a: "Sekali bayar, akses selamanya. Tidak ada langganan bulanan yang memberatkan. Bayar Rp 99.000 satu kali dan nikmati semua fitur PRO untuk selamanya." },
+    { q: "Apakah PRO bayar bulanan atau sekali bayar?", a: "Sekali bayar, akses selamanya. Tidak ada langganan bulanan yang memberatkan. Bayar Rp 129.000 satu kali dan nikmati semua fitur PRO untuk selamanya." },
     { q: "Bisa dipakai untuk hutang apa saja?", a: "Bisa untuk semua jenis hutang: KTA, kartu kredit, pinjol, cicilan motor/rumah, hutang ke keluarga/teman, PayLater, dan lainnya." },
   ];
 
