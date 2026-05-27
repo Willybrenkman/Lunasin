@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   ArrowRight, ShieldCheck, Zap, TrendingDown, Wallet,
   CheckCircle2, BarChart3, Bell, MessageSquare, ChevronDown,
@@ -9,8 +8,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const WA_LINK = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20ingin%20upgrade%20ke%20PRO";
-const WA_DAFTAR = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20ingin%20mendaftar";
+const WA_LINK = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20ingin%20upgrade%20ke%20PRO";
+const WA_DAFTAR = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20ingin%20mendaftar";
 
 export default function Home() {
   return (
@@ -38,7 +37,7 @@ function Navbar() {
         <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-lg shadow-gold/30">
           <Wallet className="text-black" size={18} />
         </div>
-        <span className="text-xl font-black tracking-tight">Lunasin.id</span>
+        <span className="text-xl font-black tracking-tight">Lunaskan.id</span>
       </div>
 
       <div className="hidden lg:flex items-center gap-8 text-[13px] font-bold text-gray-400">
@@ -71,7 +70,7 @@ function Hero() {
       <div className="absolute top-20 right-0 w-96 h-96 bg-blue-500/5 blur-[100px] rounded-full -z-10" />
 
       <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-4xl">
+        <div className="space-y-6 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/20 text-gold text-[11px] font-black px-4 py-2 rounded-full uppercase tracking-widest">
             <Zap size={12} fill="currentColor" /> Strategi Lunas Hutang Terbukti
           </div>
@@ -82,7 +81,7 @@ function Hero() {
           </h1>
 
           <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
-            Lunasin.id membantu kamu melacak, merencanakan, dan melunasi hutang lebih cepat menggunakan strategi Snowball, Avalanche & Smart Priority. Tidak perlu Excel yang ribet.
+            Lunaskan.id membantu kamu melacak, merencanakan, dan melunasi hutang lebih cepat menggunakan strategi Snowball, Avalanche & Smart Priority. Tidak perlu Excel yang ribet.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -96,11 +95,6 @@ function Hero() {
                 Lihat Demo
               </button>
             </Link>
-            <Link href="/login">
-              <button className="w-full sm:w-auto px-10 py-4 bg-white/5 border border-white/10 rounded-2xl font-black hover:bg-white/10 transition-colors text-base">
-                Sudah Punya Akun
-              </button>
-            </Link>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6 pt-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
@@ -108,21 +102,16 @@ function Hero() {
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Data aman di server Supabase</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-gold" /> Bayar sekali, akses selamanya</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* App Mockup */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mt-20 w-full max-w-5xl"
-        >
+        <div className="mt-20 w-full max-w-5xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="relative rounded-[2rem] border border-white/10 bg-[#0B0F14] p-1 shadow-[0_0_80px_rgba(212,175,55,0.08)]">
             <div className="rounded-[1.7rem] bg-[#0B0F14] overflow-hidden">
               {/* Mock Dashboard Header */}
               <div className="bg-[#0B0F14] border-b border-white/5 px-8 py-5 flex items-center gap-3">
                 <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500/60" /><div className="w-3 h-3 rounded-full bg-yellow-500/60" /><div className="w-3 h-3 rounded-full bg-green-500/60" /></div>
-                <div className="flex-1 bg-white/5 rounded-lg h-7 mx-6 flex items-center px-4"><span className="text-[11px] text-gray-500 font-medium">lunasin.id/dashboard</span></div>
+                <div className="flex-1 bg-white/5 rounded-lg h-7 mx-6 flex items-center px-4"><span className="text-[11px] text-gray-500 font-medium">lunaskan.id/dashboard</span></div>
               </div>
               {/* Mock Dashboard Content */}
               <div className="p-8 grid grid-cols-4 gap-4">
@@ -155,7 +144,7 @@ function Hero() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -188,7 +177,7 @@ function PainPoints() {
   const pains = [
     { icon: "😩", title: "Bayar terus tapi hutang gak turun?", desc: "Cicilan minimum seringkali hanya menutupi bunga. Kamu butuh strategi, bukan sekadar bayar rutin." },
     { icon: "😵", title: "Bingung hutang mana yang harus dibayar dulu?", desc: "Salah prioritas = bunga makin membengkak. Kami bantu tentukan urutan yang paling efektif." },
-    { icon: "📊", title: "Excel ribet dan sering salah hitung?", desc: "Lunasin.id kalkulasi otomatis, real-time, dan tidak perlu rumus yang membingungkan." },
+    { icon: "📊", title: "Excel ribet dan sering salah hitung?", desc: "Lunaskan.id kalkulasi otomatis, real-time, dan tidak perlu rumus yang membingungkan." },
   ];
   return (
     <section className="py-24 px-6 bg-[#080C11]">
@@ -257,7 +246,7 @@ function HowItWorks() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-gold text-[11px] font-black uppercase tracking-widest mb-3">Mudah & Cepat</p>
-          <h2 className="text-4xl font-black tracking-tight">Cara Kerja Lunasin.id</h2>
+          <h2 className="text-4xl font-black tracking-tight">Cara Kerja Lunaskan.id</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-8 relative">
           <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
@@ -337,10 +326,10 @@ function Pricing() {
 /* ─── TESTIMONIALS ─── */
 function Testimonials() {
   const testimonials = [
-    { name: "Rizky A.", role: "Karyawan Swasta, Jakarta", stars: 5, text: "Hutangku ada 4 sekaligus dan aku bingung mau bayar dari mana dulu. Setelah pakai Lunasin.id dan ikuti strategi Avalanche, dalam 8 bulan sudah lunas 2 hutang. Dashboard-nya jelas banget!" },
+    { name: "Rizky A.", role: "Karyawan Swasta, Jakarta", stars: 5, text: "Hutangku ada 4 sekaligus dan aku bingung mau bayar dari mana dulu. Setelah pakai Lunaskan.id dan ikuti strategi Avalanche, dalam 8 bulan sudah lunas 2 hutang. Dashboard-nya jelas banget!" },
     { name: "Sari W.", role: "Freelancer, Surabaya", stars: 5, text: "Dulu Excel-ku amburadul karena sering salah rumus. Sekarang semua otomatis. Fitur asisten AI-nya helpful banget, bisa langsung tanya kapan kira-kira bisa lunas." },
     { name: "Budi S.", role: "Wiraswasta, Bandung", stars: 5, text: "Yang paling suka fitur simulasi extra payment-nya. Jadi tau kalau nambah Rp 300.000/bulan, waktu lunas bisa lebih cepat 6 bulan. Worth it banget harganya!" },
-    { name: "Dewi K.", role: "Ibu Rumah Tangga, Medan", stars: 5, text: "Akhirnya ada aplikasi hutang yang simple dan tidak bikin pusing. Saya yang tidak ngerti keuangan pun bisa pakai dengan mudah. Terima kasih Lunasin.id!" },
+    { name: "Dewi K.", role: "Ibu Rumah Tangga, Medan", stars: 5, text: "Akhirnya ada aplikasi hutang yang simple dan tidak bikin pusing. Saya yang tidak ngerti keuangan pun bisa pakai dengan mudah. Terima kasih Lunaskan.id!" },
   ];
   return (
     <section id="testimoni" className="py-24 px-6 bg-[#080C11]">
@@ -425,7 +414,7 @@ function FinalCTA() {
               Waktunya Bebas<br />dari Jeratan Hutang
             </h2>
             <p className="text-gray-400 font-medium mb-10 max-w-md mx-auto">
-              Ribuan orang sudah mulai perjalanan bebas hutang mereka bersama Lunasin.id. Giliran kamu.
+              Ribuan orang sudah mulai perjalanan bebas hutang mereka bersama Lunaskan.id. Giliran kamu.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
@@ -453,7 +442,7 @@ function Footer() {
               <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center">
                 <Wallet className="text-black" size={18} />
               </div>
-              <span className="text-xl font-black">Lunasin.id</span>
+              <span className="text-xl font-black">Lunaskan.id</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-medium max-w-xs">
               Platform manajemen hutang cerdas untuk membantu masyarakat Indonesia bebas hutang lebih cepat.
@@ -479,7 +468,7 @@ function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-600 font-medium">© 2025 Lunasin.id. All rights reserved.</p>
+          <p className="text-xs text-gray-600 font-medium">© 2025 Lunaskan.id. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
             <Lock size={12} /> Data kamu aman di server Supabase
           </div>

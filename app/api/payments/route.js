@@ -13,6 +13,9 @@ export async function POST(req) {
 
     if (Number(amount) <= 0) return NextResponse.json({ error: "Jumlah pembayaran harus lebih dari 0." }, { status: 400 });
     if (!debt_id) return NextResponse.json({ error: "Hutang tidak valid." }, { status: 400 });
+    if (payment_date && new Date(payment_date) > new Date()) {
+      return NextResponse.json({ error: "Tanggal pembayaran tidak boleh di masa depan." }, { status: 400 });
+    }
 
     // Pastikan debt_id milik user yang login + ambil sisa untuk validasi amount
     const { data: debtCheck } = await supabase

@@ -10,7 +10,7 @@ export function ThemeProvider({ children }) {
 
   // Load theme dari localStorage saat mount
   useEffect(() => {
-    const saved = localStorage.getItem("lunasin-theme");
+    const saved = localStorage.getItem("lunaskan-theme");
     const initial = saved || "dark";
     setTheme(initial);
     applyTheme(initial);
@@ -30,7 +30,7 @@ export function ThemeProvider({ children }) {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     applyTheme(newTheme);
-    localStorage.setItem("lunasin-theme", newTheme);
+    localStorage.setItem("lunaskan-theme", newTheme);
   };
 
   return (

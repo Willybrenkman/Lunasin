@@ -45,6 +45,9 @@ export async function POST(req) {
     if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
     if (Number(interest) < 0 || Number(interest) > 1000) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
     if (debt_type && !VALID_DEBT_TYPES.includes(debt_type)) return NextResponse.json({ error: "Jenis hutang tidak valid." }, { status: 400 });
+    if (tanggal_mulai && new Date(tanggal_mulai) > new Date()) {
+      return NextResponse.json({ error: "Tanggal mulai tidak boleh di masa depan." }, { status: 400 });
+    }
 
     const { data, error } = await supabase
       .from("debts")

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Lunasin.id — Lunasi Hutang Lebih Cepat & Terarah",
+  title: "Lunaskan.id — Lunasi Hutang Lebih Cepat & Terarah",
   description: "Aplikasi web untuk mengelola dan melunasi hutang dengan strategi Snowball, Avalanche, atau Smart Priority.",
 };
 
@@ -22,7 +22,7 @@ export const metadata = {
 const themeScript = `
 (function() {
   try {
-    var saved = localStorage.getItem('lunasin-theme');
+    var saved = localStorage.getItem('lunaskan-theme');
     if (saved === 'light') {
       document.documentElement.classList.add('light');
     }

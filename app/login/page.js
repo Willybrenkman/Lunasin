@@ -62,7 +62,7 @@ function LoginContent() {
           <div className="w-14 h-14 bg-gold rounded-[1.2rem] flex items-center justify-center shadow-2xl shadow-gold/20">
             <Wallet className="text-black" size={32} />
           </div>
-          <h1 className="text-2xl font-black tracking-tight">Lunasin.id</h1>
+          <h1 className="text-2xl font-black tracking-tight">Lunaskan.id</h1>
           <p className="text-gray-500 text-sm text-center font-medium">
             Masuk dengan akun yang diberikan admin
           </p>
@@ -146,7 +146,7 @@ function LoginContent() {
         <p className="text-center text-xs text-gray-500 font-medium flex items-center justify-center gap-2 flex-wrap">
           Belum punya akun?
           <a
-            href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20ingin%20mendaftar"
+            href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20ingin%20mendaftar"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gold font-black hover:underline"

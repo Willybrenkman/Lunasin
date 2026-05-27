@@ -190,7 +190,7 @@ export default function AddDebt() {
                   <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl px-4 py-2 flex items-center gap-2">
                     <Info size={13} className="text-blue-400 shrink-0" />
                     <p className="text-[11px] text-blue-400">
-                      Masukkan bunga sesuai yang tertulis di kontrak. Lunasin konversi ke efektif tahunan otomatis.
+                      Masukkan bunga sesuai yang tertulis di kontrak. Lunaskan konversi ke efektif tahunan otomatis.
                     </p>
                   </div>
                 )}

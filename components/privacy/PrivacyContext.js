@@ -1,46 +1,43 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 
 const PrivacyContext = createContext();
 
 export function PrivacyProvider({ children }) {
   const [isPrivate, setIsPrivate] = useState(false);
 
-  // Load state from localStorage if available
   useEffect(() => {
-    const saved = localStorage.getItem("lunasin_privacy");
-    if (saved) {
-      setIsPrivate(saved === "true");
-    }
+    const saved = localStorage.getItem("lunaskan_privacy");
+    if (saved) setIsPrivate(saved === "true");
   }, []);
 
-  const togglePrivacy = () => {
+  const togglePrivacy = useCallback(() => {
     setIsPrivate((prev) => {
       const next = !prev;
-      localStorage.setItem("lunasin_privacy", next);
+      localStorage.setItem("lunaskan_privacy", String(next));
       return next;
     });
-  };
+  }, []);
 
-  const formatMoney = (amount) => {
+  const formatMoney = useCallback((amount) => {
     if (isPrivate) return "Rp •••••••";
-    
     const num = Number(amount);
-    if (!isNaN(num)) {
-      return `Rp ${num.toLocaleString('id-ID')}`;
-    }
-    
-    return amount;
-  };
+    return !isNaN(num) ? `Rp ${num.toLocaleString('id-ID')}` : amount;
+  }, [isPrivate]);
 
-  const maskString = (str) => {
+  const maskString = useCallback((str) => {
     if (isPrivate) return "•••••••";
     return str;
-  };
+  }, [isPrivate]);
+
+  const value = useMemo(
+    () => ({ isPrivate, togglePrivacy, formatMoney, maskString }),
+    [isPrivate, togglePrivacy, formatMoney, maskString]
+  );
 
   return (
-    <PrivacyContext.Provider value={{ isPrivate, togglePrivacy, formatMoney, maskString }}>
+    <PrivacyContext.Provider value={value}>
       {children}
     </PrivacyContext.Provider>
   );

@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }) {
     { label: "Laporan", href: "/dashboard/laporan", icon: "📄" },
     { label: "Pengingat", href: "/dashboard/pengingat", icon: "🔔" },
     { label: "Pengaturan", href: "/dashboard/pengaturan", icon: "⚙️" },
-    { label: "Asisten Lunasin", href: "/dashboard/ai", icon: "✨" },
+    { label: "Asisten Lunaskan", href: "/dashboard/ai", icon: "✨" },
     { label: "Bonus Premium", href: "/dashboard/bonus", icon: "🎁" },
     { label: "Panduan Aplikasi", href: "/dashboard/panduan", icon: "📖" },
   ];
@@ -132,7 +132,7 @@ export default function DashboardLayout({ children }) {
           <div className="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.3)]">
             <Wallet className="text-black" size={22} />
           </div>
-          <span className="text-xl font-black tracking-tight text-white">Lunasin.id</span>
+          <span className="text-xl font-black tracking-tight text-white">Lunaskan.id</span>
         </div>
 
         <nav className="flex flex-col gap-1.5 px-2">
@@ -145,7 +145,7 @@ export default function DashboardLayout({ children }) {
           <SidebarLink icon={<Settings size={20} />} label="Pengaturan" href="/dashboard/pengaturan" active={pathname === "/dashboard/pengaturan"} />
           
           <div className="my-2 border-t border-white/5"></div>
-          <SidebarLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunasin" href="/dashboard/ai" active={pathname === "/dashboard/ai"} />
+          <SidebarLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunaskan" href="/dashboard/ai" active={pathname === "/dashboard/ai"} />
           <SidebarLink icon={<Gift size={20} />} label="Bonus Premium" href="/dashboard/bonus" active={pathname === "/dashboard/bonus"} />
           <SidebarLink icon={<BookOpen size={20} />} label="Panduan Aplikasi" href="/dashboard/panduan" active={pathname === "/dashboard/panduan"} />
         </nav>
@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }) {
 
         {/* Bottom Nav */}
         <div className="mt-auto flex flex-col gap-1 border-t border-white/5 pt-6 px-2">
-          <SidebarLink icon={<HelpCircle size={20} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20butuh%20bantuan" target="_blank" />
+          <SidebarLink icon={<HelpCircle size={20} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan" target="_blank" />
           <button onClick={handleLogout} className="flex items-center gap-4 p-3 rounded-xl transition-all duration-300 font-bold text-[13px] text-gray-500 hover:text-white hover:bg-white/5">
             <LogOut size={20} />
             <span>Keluar</span>
@@ -224,7 +224,7 @@ export default function DashboardLayout({ children }) {
                 <p className="text-[10px] text-gold font-black uppercase tracking-widest mt-0.5">{profile.is_pro ? "Pro Member" : "Free Account"}</p>
               </div>
               <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 p-0.5 hover:scale-105 transition-transform cursor-pointer bg-[#0F1319]">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" loading="lazy" className="w-full h-full object-cover rounded-[0.5rem]" />
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" loading="lazy" className="w-full h-full object-cover rounded-[0.5rem]" onError={e => { e.currentTarget.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' fill='%23D4AF37'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='black'>${(profile.display_name?.[0] || 'U').toUpperCase()}</text></svg>`; }} />
               </div>
             </div>
           </div>
@@ -285,7 +285,7 @@ export default function DashboardLayout({ children }) {
                   <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center">
                     <Wallet className="text-black" size={18} />
                   </div>
-                  <span className="text-lg font-black text-white">Lunasin.id</span>
+                  <span className="text-lg font-black text-white">Lunaskan.id</span>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-white transition-colors">
                   <X size={20} />
@@ -301,13 +301,13 @@ export default function DashboardLayout({ children }) {
                 <MobileNavLink icon={<Bell size={18} />} label="Pengingat" href="/dashboard/pengingat" active={pathname === "/dashboard/pengingat"} onClick={() => setMobileMenuOpen(false)} />
                 <MobileNavLink icon={<Settings size={18} />} label="Pengaturan" href="/dashboard/pengaturan" active={pathname === "/dashboard/pengaturan"} onClick={() => setMobileMenuOpen(false)} />
                 <div className="my-2 border-t border-white/5" />
-                <MobileNavLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunasin" href="/dashboard/ai" active={pathname === "/dashboard/ai"} onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<span className="text-[#D4AF37]">✨</span>} label="Asisten Lunaskan" href="/dashboard/ai" active={pathname === "/dashboard/ai"} onClick={() => setMobileMenuOpen(false)} />
                 <MobileNavLink icon={<Gift size={18} />} label="Bonus Premium" href="/dashboard/bonus" active={pathname === "/dashboard/bonus"} onClick={() => setMobileMenuOpen(false)} />
                 <MobileNavLink icon={<BookOpen size={18} />} label="Panduan Aplikasi" href="/dashboard/panduan" active={pathname === "/dashboard/panduan"} onClick={() => setMobileMenuOpen(false)} />
               </nav>
 
               <div className="border-t border-white/5 pt-4 flex flex-col gap-1">
-                <MobileNavLink icon={<HelpCircle size={18} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20butuh%20bantuan" onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<HelpCircle size={18} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan" onClick={() => setMobileMenuOpen(false)} />
                 <button onClick={handleLogout} className="flex items-center gap-3 p-3 rounded-xl font-bold text-sm text-gray-500 hover:text-white hover:bg-white/5 transition-all">
                   <LogOut size={18} /> Keluar
                 </button>

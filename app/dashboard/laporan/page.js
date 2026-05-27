@@ -28,22 +28,14 @@ export default function LaporanPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { if (!cachedDebts) setLoading(false); return; }
 
-        // Fetch debts
-        const { data: debtsData } = await supabase
-          .from("debts")
-          .select("*")
-          .eq("user_id", user.id);
+        const [{ data: debtsData }, { data: paymentsData }] = await Promise.all([
+          supabase.from("debts").select("*").eq("user_id", user.id),
+          supabase.from("payments").select("*, debts(name)").eq("user_id", user.id).order("payment_date", { ascending: true }),
+        ]);
         if (debtsData) {
           setDebts(debtsData);
           sessionStorage.setItem("debts_cache", JSON.stringify(debtsData));
         }
-
-        // Fetch payments with debt name join
-        const { data: paymentsData } = await supabase
-          .from("payments")
-          .select("*, debts(name)")
-          .eq("user_id", user.id)
-          .order("payment_date", { ascending: true });
         if (paymentsData) {
           setPayments(paymentsData);
           sessionStorage.setItem("payments_cache", JSON.stringify(paymentsData));

@@ -126,7 +126,17 @@ export default function Pengaturan() {
       {/* Profile Header */}
       <div className="flex items-center gap-6 bg-[#0F1319] p-8 rounded-[2rem] border border-white/5">
         <div className="w-24 h-24 bg-[#0A0D12] rounded-full overflow-hidden border-4 border-white/5">
-          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Profile" loading="lazy" />
+          <img
+            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`}
+            alt="Profile"
+            loading="lazy"
+            className="w-full h-full object-cover"
+            onError={e => {
+              const initial = (profile.display_name || "U")[0].toUpperCase();
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='96' height='96' fill='%23D4AF37'/><text x='48' y='62' text-anchor='middle' fill='black' font-size='40' font-family='sans-serif' font-weight='900'>${initial}</text></svg>`;
+            }}
+          />
         </div>
         <div className="flex-1">
           {editMode ? (
@@ -229,7 +239,7 @@ export default function Pengaturan() {
               icon={<Shield size={18} />}
               label="Customer Service"
               sub="Hubungi admin untuk bantuan"
-              onClick={() => window.open("https://wa.me/6289627314790?text=Halo%20Admin%20Lunasin.id,%20saya%20butuh%20bantuan", "_blank")}
+              onClick={() => window.open("https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan", "_blank")}
             />
             <div
               onClick={handleLogout}

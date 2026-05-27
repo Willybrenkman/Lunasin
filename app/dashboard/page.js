@@ -122,7 +122,7 @@ export default function Dashboard() {
       <div>
         <h2 className="text-2xl font-black text-white mb-2">Belum ada hutang tercatat</h2>
         <p className="text-gray-500 max-w-sm leading-relaxed">
-          Mulai catat hutangmu sekarang dan biarkan Lunasin membantumu melunasinya lebih cepat.
+          Mulai catat hutangmu sekarang dan biarkan Lunaskan membantumu melunasinya lebih cepat.
         </p>
       </div>
       <Link href="/dashboard/add">
@@ -190,7 +190,7 @@ export default function Dashboard() {
         <div>
           <div className="luxury-card-highlight rounded-[2rem] p-8 h-full flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-[10px] mb-6 text-gray-500 uppercase tracking-widest flex items-center">Strategi Terbaik Untuk Kamu <Tooltip text="Lunasin merekomendasikan strategi berdasarkan kombinasi bunga, sisa hutang, dan cicilan minimummu. Kamu bisa ganti strategi dari grafik." /></h3>
+              <h3 className="font-bold text-[10px] mb-6 text-gray-500 uppercase tracking-widest flex items-center">Strategi Terbaik Untuk Kamu <Tooltip text="Lunaskan merekomendasikan strategi berdasarkan kombinasi bunga, sisa hutang, dan cicilan minimummu. Kamu bisa ganti strategi dari grafik." /></h3>
 
               <div className="bg-gold/10 border border-gold/20 rounded-2xl p-5 mb-6">
                 <div className="flex items-center gap-3 mb-3">
@@ -345,7 +345,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="bg-black/30 rounded-xl p-4 mb-6 text-xs text-gray-400 leading-relaxed whitespace-pre-line">
-              {`📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`}
+              {`📊 *Laporan Hutangku — Lunaskan.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.id`}
             </div>
             <div className="flex gap-3">
               <button
@@ -358,7 +358,7 @@ export default function Dashboard() {
                 onClick={() => {
                   if (!waNumber) return;
                   const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : waNumber.startsWith("62") ? waNumber : `62${waNumber}`;
-                  const pesan = `📊 *Laporan Hutangku — Lunasin.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunasin.id`;
+                  const pesan = `📊 *Laporan Hutangku — Lunaskan.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.id`;
                   window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
                   setShareModal(false);
                   setWaNumber("");

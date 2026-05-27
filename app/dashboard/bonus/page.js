@@ -40,7 +40,7 @@ export default function BonusPage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 blur-[100px] rounded-full" />
         <h1 className="text-3xl font-black mb-4 text-white">🎁 Bonus Premium</h1>
         <p className="text-gray-400 max-w-2xl text-sm leading-relaxed">
-          Terima kasih telah bergabung dengan Lunasin PRO. Sebagai member eksklusif, Anda berhak mengunduh semua materi pendukung di bawah ini secara gratis. Gunakan template ini untuk mempercepat proses kebebasan finansial Anda.
+          Terima kasih telah bergabung dengan Lunaskan PRO. Sebagai member eksklusif, Anda berhak mengunduh semua materi pendukung di bawah ini secara gratis. Gunakan template ini untuk mempercepat proses kebebasan finansial Anda.
         </p>
       </div>
 
