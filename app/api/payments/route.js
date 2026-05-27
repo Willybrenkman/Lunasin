@@ -62,34 +62,15 @@ export async function DELETE(req) {
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID tidak valid." }, { status: 400 });
 
-    // Ambil data payment + verifikasi kepemilikan
-    const { data: payment } = await supabase
-      .from("payments")
-      .select("id, debt_id, amount, user_id")
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .single();
+    // Atomic: hapus payment + kembalikan sisa + reset status — satu transaksi DB
+    const { data, error } = await supabase.rpc("delete_payment_and_restore", {
+      p_payment_id: id,
+      p_user_id: user.id,
+    });
 
-    if (!payment) return NextResponse.json({ error: "Pembayaran tidak ditemukan." }, { status: 404 });
-
-    // Hapus payment
-    const { error: deleteError } = await supabase
-      .from("payments")
-      .delete()
-      .eq("id", id);
-
-    if (deleteError) throw deleteError;
-
-    // Kembalikan amount ke sisa hutang
-    const { data: debt } = await supabase
-      .from("debts")
-      .select("sisa, total")
-      .eq("id", payment.debt_id)
-      .single();
-
-    if (debt) {
-      const newSisa = Math.min(Number(debt.sisa) + Number(payment.amount), Number(debt.total));
-      await supabase.from("debts").update({ sisa: newSisa }).eq("id", payment.debt_id);
+    if (error) throw error;
+    if (data && !data.success) {
+      return NextResponse.json({ error: data.error || "Pembayaran tidak ditemukan." }, { status: 404 });
     }
 
     return NextResponse.json({ success: true });

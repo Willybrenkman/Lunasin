@@ -39,6 +39,8 @@ export async function POST(req) {
     const { name, total, interest, min_payment, tanggal_mulai, jatuh_tempo, tanggal_tagihan, notes, debt_type } = body;
 
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
+    if (name.trim().length > 100) return NextResponse.json({ error: "Nama hutang maksimal 100 karakter." }, { status: 400 });
+    if (notes && notes.length > 1000) return NextResponse.json({ error: "Catatan maksimal 1000 karakter." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
     if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
     if (Number(interest) < 0 || Number(interest) > 1000) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
@@ -81,9 +83,12 @@ export async function PUT(req) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     if (!name?.trim()) return NextResponse.json({ error: "Nama hutang wajib diisi." }, { status: 400 });
+    if (name.trim().length > 100) return NextResponse.json({ error: "Nama hutang maksimal 100 karakter." }, { status: 400 });
+    if (notes && notes.length > 1000) return NextResponse.json({ error: "Catatan maksimal 1000 karakter." }, { status: 400 });
     if (Number(total) <= 0) return NextResponse.json({ error: "Total hutang harus lebih dari 0." }, { status: 400 });
     if (Number(sisa) < 0 || Number(sisa) > Number(total)) return NextResponse.json({ error: "Sisa hutang tidak valid (harus antara 0 dan total hutang)." }, { status: 400 });
-    if (Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
+    const isPaidOff = status === "paid_off" || Number(sisa) === 0;
+    if (!isPaidOff && Number(min_payment) <= 0) return NextResponse.json({ error: "Cicilan minimum harus lebih dari 0." }, { status: 400 });
     if (Number(interest) < 0 || Number(interest) > 1000) return NextResponse.json({ error: "Bunga tidak valid." }, { status: 400 });
     if (debt_type && !VALID_DEBT_TYPES.includes(debt_type)) return NextResponse.json({ error: "Jenis hutang tidak valid." }, { status: 400 });
     if (status && !VALID_STATUSES.includes(status)) return NextResponse.json({ error: "Status tidak valid." }, { status: 400 });

@@ -41,6 +41,13 @@ function generateResponse(message, debts) {
   const msg = message.toLowerCase().trim();
   const { totalSisa, totalMin, highestInterest, smallestDebt, activeDebts, paidOff, avgInterest } = analyzeDebts(debts);
 
+  if (activeDebts.length === 0) {
+    return pick([
+      `🎉 Semua hutangmu sudah lunas! Pencapaian luar biasa yang patut dirayakan.\n\nKamu sudah berhasil menyelesaikan **${paidOff.length} hutang**. Sekarang saatnya membangun kekayaan — alihkan uang cicilanmu ke investasi setiap bulan. Mau saya jelaskan langkah finansial terbaik setelah bebas hutang?`,
+      `Kamu sudah bebas hutang! 🎊 Itu hal yang nggak semua orang berhasil capai.\n\nAda pertanyaan soal langkah selanjutnya — tabungan, investasi, atau rencana keuangan jangka panjang? Saya siap bantu!`,
+    ]);
+  }
+
   // --- Sapaan ---
   if (msg.match(/^(halo|hai|hi|hey|hello|selamat|pagi|siang|sore|malam|apa kabar|assalamu|hallo|p+a+g+i|s+o+r+e)/)) {
     return pick([
