@@ -239,7 +239,7 @@ export default function Pengaturan() {
               icon={<Shield size={18} />}
               label="Customer Service"
               sub="Hubungi admin untuk bantuan"
-              onClick={() => window.open("https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan", "_blank")}
+              onClick={() => window.open("https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20butuh%20bantuan", "_blank")}
             />
             <div
               onClick={handleLogout}

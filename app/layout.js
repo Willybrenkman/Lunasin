@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Lunaskan.id — Lunasi Hutang Lebih Cepat & Terarah",
+  title: "Lunaskan.online — Lunasi Hutang Lebih Cepat & Terarah",
   description: "Aplikasi web untuk mengelola dan melunasi hutang dengan strategi Snowball, Avalanche, atau Smart Priority.",
 };
 

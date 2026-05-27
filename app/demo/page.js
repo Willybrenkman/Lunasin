@@ -61,7 +61,7 @@ export default function DemoPage() {
             <div className="w-10 h-10 bg-gold rounded-[0.8rem] flex items-center justify-center">
               <Wallet className="text-black" size={22} />
             </div>
-            <span className="text-lg font-black tracking-tight">Lunaskan.id</span>
+            <span className="text-lg font-black tracking-tight">Lunaskan.online</span>
           </div>
 
           <nav className="space-y-2 flex-1">
@@ -200,7 +200,7 @@ export default function DemoPage() {
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <a
-                href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20tertarik%20membeli%20lisensi%20PRO"
+                href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20tertarik%20membeli%20lisensi%20PRO"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gold text-black px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-gold/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"

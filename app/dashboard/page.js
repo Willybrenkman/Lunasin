@@ -345,7 +345,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="bg-black/30 rounded-xl p-4 mb-6 text-xs text-gray-400 leading-relaxed whitespace-pre-line">
-              {`📊 *Laporan Hutangku — Lunaskan.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.id`}
+              {`📊 *Laporan Hutangku — Lunaskan.online*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.online`}
             </div>
             <div className="flex gap-3">
               <button
@@ -358,7 +358,7 @@ export default function Dashboard() {
                 onClick={() => {
                   if (!waNumber) return;
                   const nomor = waNumber.startsWith("0") ? `62${waNumber.slice(1)}` : waNumber.startsWith("62") ? waNumber : `62${waNumber}`;
-                  const pesan = `📊 *Laporan Hutangku — Lunaskan.id*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.id`;
+                  const pesan = `📊 *Laporan Hutangku — Lunaskan.online*\n\n💰 Total Hutang: ${formatMoney(totalHutang)}\n📉 Sisa Hutang: ${formatMoney(sisaHutang)}\n✅ Progress: ${progressPct}%\n⏱ Estimasi Lunas: ${simMonths > 0 ? `${simMonths} bulan` : "-"}\n📌 Strategi: ${strategy}\n\nYuk bebas hutang! 🎯\nlunaskan.online`;
                   window.open(`https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`, "_blank");
                   setShareModal(false);
                   setWaNumber("");

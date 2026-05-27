@@ -6,7 +6,7 @@ export default function PanduanPage() {
   return (
     <div className="space-y-8 animate-in fade-in zoom-in duration-500 max-w-4xl">
       <div className="bg-[#0B0F14] border border-white/5 p-8 rounded-3xl relative overflow-hidden">
-        <h1 className="text-3xl font-black mb-2 text-white">📖 Panduan Lunaskan.id</h1>
+        <h1 className="text-3xl font-black mb-2 text-white">📖 Panduan Lunaskan.online</h1>
         <p className="text-gray-400 text-sm">Pelajari cara menggunakan sistem ini untuk menghancurkan hutang Anda.</p>
       </div>
 
@@ -80,7 +80,7 @@ export default function PanduanPage() {
             Aturan Emas!
           </h2>
           <p className="text-gray-300 text-sm leading-relaxed">
-            <strong>Jangan pernah gali lubang tutup lubang.</strong> Meminjam pinjol baru untuk menutup pinjol lama adalah awal kehancuran. Gunakan Lunaskan.id untuk melakukan restrukturisasi, potong pengeluaran, dan ikuti rencana yang telah dibuatkan oleh sistem.
+            <strong>Jangan pernah gali lubang tutup lubang.</strong> Meminjam pinjol baru untuk menutup pinjol lama adalah awal kehancuran. Gunakan Lunaskan.online untuk melakukan restrukturisasi, potong pengeluaran, dan ikuti rencana yang telah dibuatkan oleh sistem.
           </p>
         </section>
       </div>

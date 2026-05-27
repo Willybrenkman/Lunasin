@@ -132,7 +132,7 @@ export default function DashboardLayout({ children }) {
           <div className="w-10 h-10 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.3)]">
             <Wallet className="text-black" size={22} />
           </div>
-          <span className="text-xl font-black tracking-tight text-white">Lunaskan.id</span>
+          <span className="text-xl font-black tracking-tight text-white">Lunaskan.online</span>
         </div>
 
         <nav className="flex flex-col gap-1.5 px-2">
@@ -164,7 +164,7 @@ export default function DashboardLayout({ children }) {
 
         {/* Bottom Nav */}
         <div className="mt-auto flex flex-col gap-1 border-t border-white/5 pt-6 px-2">
-          <SidebarLink icon={<HelpCircle size={20} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan" target="_blank" />
+          <SidebarLink icon={<HelpCircle size={20} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20butuh%20bantuan" target="_blank" />
           <button onClick={handleLogout} className="flex items-center gap-4 p-3 rounded-xl transition-all duration-300 font-bold text-[13px] text-gray-500 hover:text-white hover:bg-white/5">
             <LogOut size={20} />
             <span>Keluar</span>
@@ -285,7 +285,7 @@ export default function DashboardLayout({ children }) {
                   <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center">
                     <Wallet className="text-black" size={18} />
                   </div>
-                  <span className="text-lg font-black text-white">Lunaskan.id</span>
+                  <span className="text-lg font-black text-white">Lunaskan.online</span>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500 hover:text-white transition-colors">
                   <X size={20} />
@@ -307,7 +307,7 @@ export default function DashboardLayout({ children }) {
               </nav>
 
               <div className="border-t border-white/5 pt-4 flex flex-col gap-1">
-                <MobileNavLink icon={<HelpCircle size={18} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20butuh%20bantuan" onClick={() => setMobileMenuOpen(false)} />
+                <MobileNavLink icon={<HelpCircle size={18} />} label="Customer Service" href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20butuh%20bantuan" onClick={() => setMobileMenuOpen(false)} />
                 <button onClick={handleLogout} className="flex items-center gap-3 p-3 rounded-xl font-bold text-sm text-gray-500 hover:text-white hover:bg-white/5 transition-all">
                   <LogOut size={18} /> Keluar
                 </button>

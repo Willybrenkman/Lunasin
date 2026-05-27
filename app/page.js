@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const WA_LINK = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20ingin%20upgrade%20ke%20PRO";
-const WA_DAFTAR = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.id,%20saya%20ingin%20mendaftar";
+const WA_LINK = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20ingin%20upgrade%20ke%20PRO";
+const WA_DAFTAR = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20ingin%20mendaftar";
 
 export default function Home() {
   return (
@@ -37,7 +37,7 @@ function Navbar() {
         <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center shadow-lg shadow-gold/30">
           <Wallet className="text-black" size={18} />
         </div>
-        <span className="text-xl font-black tracking-tight">Lunaskan.id</span>
+        <span className="text-xl font-black tracking-tight">Lunaskan.online</span>
       </div>
 
       <div className="hidden lg:flex items-center gap-8 text-[13px] font-bold text-gray-400">
@@ -81,7 +81,7 @@ function Hero() {
           </h1>
 
           <p className="text-gray-400 text-lg md:text-xl leading-relaxed max-w-2xl mx-auto font-medium">
-            Lunaskan.id membantu kamu melacak, merencanakan, dan melunasi hutang lebih cepat menggunakan strategi Snowball, Avalanche & Smart Priority. Tidak perlu Excel yang ribet.
+            Lunaskan.online membantu kamu melacak, merencanakan, dan melunasi hutang lebih cepat menggunakan strategi Snowball, Avalanche & Smart Priority. Tidak perlu Excel yang ribet.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -111,7 +111,7 @@ function Hero() {
               {/* Mock Dashboard Header */}
               <div className="bg-[#0B0F14] border-b border-white/5 px-8 py-5 flex items-center gap-3">
                 <div className="flex gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500/60" /><div className="w-3 h-3 rounded-full bg-yellow-500/60" /><div className="w-3 h-3 rounded-full bg-green-500/60" /></div>
-                <div className="flex-1 bg-white/5 rounded-lg h-7 mx-6 flex items-center px-4"><span className="text-[11px] text-gray-500 font-medium">lunaskan.id/dashboard</span></div>
+                <div className="flex-1 bg-white/5 rounded-lg h-7 mx-6 flex items-center px-4"><span className="text-[11px] text-gray-500 font-medium">lunaskan.online/dashboard</span></div>
               </div>
               {/* Mock Dashboard Content */}
               <div className="p-8 grid grid-cols-4 gap-4">
@@ -177,7 +177,7 @@ function PainPoints() {
   const pains = [
     { icon: "😩", title: "Bayar terus tapi hutang gak turun?", desc: "Cicilan minimum seringkali hanya menutupi bunga. Kamu butuh strategi, bukan sekadar bayar rutin." },
     { icon: "😵", title: "Bingung hutang mana yang harus dibayar dulu?", desc: "Salah prioritas = bunga makin membengkak. Kami bantu tentukan urutan yang paling efektif." },
-    { icon: "📊", title: "Excel ribet dan sering salah hitung?", desc: "Lunaskan.id kalkulasi otomatis, real-time, dan tidak perlu rumus yang membingungkan." },
+    { icon: "📊", title: "Excel ribet dan sering salah hitung?", desc: "Lunaskan.online kalkulasi otomatis, real-time, dan tidak perlu rumus yang membingungkan." },
   ];
   return (
     <section className="py-24 px-6 bg-[#080C11]">
@@ -246,7 +246,7 @@ function HowItWorks() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-gold text-[11px] font-black uppercase tracking-widest mb-3">Mudah & Cepat</p>
-          <h2 className="text-4xl font-black tracking-tight">Cara Kerja Lunaskan.id</h2>
+          <h2 className="text-4xl font-black tracking-tight">Cara Kerja Lunaskan.online</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-8 relative">
           <div className="hidden md:block absolute top-10 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
@@ -326,10 +326,10 @@ function Pricing() {
 /* ─── TESTIMONIALS ─── */
 function Testimonials() {
   const testimonials = [
-    { name: "Rizky A.", role: "Karyawan Swasta, Jakarta", stars: 5, text: "Hutangku ada 4 sekaligus dan aku bingung mau bayar dari mana dulu. Setelah pakai Lunaskan.id dan ikuti strategi Avalanche, dalam 8 bulan sudah lunas 2 hutang. Dashboard-nya jelas banget!" },
+    { name: "Rizky A.", role: "Karyawan Swasta, Jakarta", stars: 5, text: "Hutangku ada 4 sekaligus dan aku bingung mau bayar dari mana dulu. Setelah pakai Lunaskan.online dan ikuti strategi Avalanche, dalam 8 bulan sudah lunas 2 hutang. Dashboard-nya jelas banget!" },
     { name: "Sari W.", role: "Freelancer, Surabaya", stars: 5, text: "Dulu Excel-ku amburadul karena sering salah rumus. Sekarang semua otomatis. Fitur asisten AI-nya helpful banget, bisa langsung tanya kapan kira-kira bisa lunas." },
     { name: "Budi S.", role: "Wiraswasta, Bandung", stars: 5, text: "Yang paling suka fitur simulasi extra payment-nya. Jadi tau kalau nambah Rp 300.000/bulan, waktu lunas bisa lebih cepat 6 bulan. Worth it banget harganya!" },
-    { name: "Dewi K.", role: "Ibu Rumah Tangga, Medan", stars: 5, text: "Akhirnya ada aplikasi hutang yang simple dan tidak bikin pusing. Saya yang tidak ngerti keuangan pun bisa pakai dengan mudah. Terima kasih Lunaskan.id!" },
+    { name: "Dewi K.", role: "Ibu Rumah Tangga, Medan", stars: 5, text: "Akhirnya ada aplikasi hutang yang simple dan tidak bikin pusing. Saya yang tidak ngerti keuangan pun bisa pakai dengan mudah. Terima kasih Lunaskan.online!" },
   ];
   return (
     <section id="testimoni" className="py-24 px-6 bg-[#080C11]">
@@ -414,7 +414,7 @@ function FinalCTA() {
               Waktunya Bebas<br />dari Jeratan Hutang
             </h2>
             <p className="text-gray-400 font-medium mb-10 max-w-md mx-auto">
-              Ribuan orang sudah mulai perjalanan bebas hutang mereka bersama Lunaskan.id. Giliran kamu.
+              Ribuan orang sudah mulai perjalanan bebas hutang mereka bersama Lunaskan.online. Giliran kamu.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
@@ -442,7 +442,7 @@ function Footer() {
               <div className="w-9 h-9 bg-[#D4AF37] rounded-xl flex items-center justify-center">
                 <Wallet className="text-black" size={18} />
               </div>
-              <span className="text-xl font-black">Lunaskan.id</span>
+              <span className="text-xl font-black">Lunaskan.online</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-medium max-w-xs">
               Platform manajemen hutang cerdas untuk membantu masyarakat Indonesia bebas hutang lebih cepat.
@@ -468,7 +468,7 @@ function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-600 font-medium">© 2025 Lunaskan.id. All rights reserved.</p>
+          <p className="text-xs text-gray-600 font-medium">© 2025 Lunaskan.online. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
             <Lock size={12} /> Data kamu aman di server Supabase
           </div>
