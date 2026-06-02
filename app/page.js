@@ -6,8 +6,8 @@ import {
 } from "lucide-react";
 import FAQSection from "@/components/FAQSection";
 
-const WA_LINK = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20ingin%20upgrade%20ke%20PRO";
-const WA_DAFTAR = "https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20ingin%20mendaftar";
+const WA_LINK = "https://rapidigital.myscalev.com/lunaskan-pro";
+const WA_DAFTAR = "https://rapidigital.myscalev.com/lunaskan-pro";
 
 export default function Home() {
   return (
