@@ -20,6 +20,7 @@ export default function Home() {
         <Features />
         <HowItWorks />
         <Pricing />
+        <Bonuses />
         <Testimonials />
         <FAQSection />
         <FinalCTA />
@@ -335,6 +336,42 @@ function Pricing() {
   );
 }
 
+
+/* ─── BONUSES ─── */
+function Bonuses() {
+  const bonuses = [
+    { icon: "📊", title: "Darurat Plan 72 Jam", format: "Excel", desc: "Worksheet hitung nafas keuangan & langkah darurat saat baru sadar tidak bisa bayar cicilan." },
+    { icon: "📄", title: "Template Surat Negosiasi & UU PDP", format: "Word", desc: "Draft surat minta keringanan ke bank + surat teguran untuk DC pinjol ilegal yang sebar data pribadimu." },
+    { icon: "📅", title: "Kalender Motivasi 90 Hari", format: "PDF + Excel", desc: "Checklist harian 3 bulan untuk membangun kedisiplinan melunasi hutang secara konsisten." },
+    { icon: "📖", title: "E-Book: Rahasia Bebas Hutang", format: "PDF", desc: "Panduan lengkap keluar dari lubang hutang tanpa harus berhutang lagi." },
+    { icon: "💬", title: "Grup Sharing & Diskusi", format: "Telegram", desc: "Komunitas eksklusif member PRO untuk berbagi strategi, pengalaman, dan motivasi bersama." },
+  ];
+
+  return (
+    <section className="py-24 px-6 bg-[#080C11]">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-gold text-[11px] font-black uppercase tracking-widest mb-3">Khusus Member PRO</p>
+          <h2 className="text-4xl font-black tracking-tight mb-4">🎁 5 Bonus Eksklusif Gratis</h2>
+          <p className="text-gray-500 font-medium max-w-xl mx-auto">Beli PRO sekali, dapat semua bonus ini tanpa biaya tambahan. Langsung bisa didownload setelah akses aktif.</p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {bonuses.map((b, i) => (
+            <div key={i} className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 hover:border-gold/20 transition-all group flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl">{b.icon}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-white/5 px-3 py-1 rounded-full">{b.format}</span>
+              </div>
+              <h3 className="font-black text-white text-sm leading-snug">{b.title}</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">{b.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-xs text-gray-600 font-medium mt-8">✅ Semua bonus tersedia langsung di dashboard setelah akses PRO aktif</p>
+      </div>
+    </section>
+  );
+}
 
 /* ─── TESTIMONIALS ─── */
 function Testimonials() {
