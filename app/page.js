@@ -63,14 +63,11 @@ function Navbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link href="/login" className="text-[13px] font-bold text-gray-400 hover:text-white transition-colors hidden sm:block">
-          Masuk
-        </Link>
-        <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
+        <Link href="/login">
           <button className="bg-[#D4AF37] text-black px-5 py-2.5 rounded-xl text-[13px] font-black shadow-lg shadow-gold/20 hover:brightness-110 transition-all">
-            Daftar Sekarang
+            Masuk
           </button>
-        </a>
+        </Link>
       </div>
     </nav>
   );
