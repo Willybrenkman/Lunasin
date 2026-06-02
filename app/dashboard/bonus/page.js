@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, FileSpreadsheet, FileText, BookOpen, Lock } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, BookOpen, Users } from "lucide-react";
 
 export default function BonusPage() {
   const bonuses = [
@@ -31,6 +31,14 @@ export default function BonusPage() {
       icon: <BookOpen className="text-gold" size={32} />,
       format: "PDF Document",
       link: "https://docs.google.com/document/d/19M23bscT8adDudpjfdJdgmRij0IR09SY/edit?usp=sharing"
+    },
+    {
+      title: "Grup Sharing & Diskusi",
+      description: "Bergabung dengan komunitas eksklusif member PRO Lunaskan. Saling berbagi strategi, pengalaman, dan motivasi bersama sesama pejuang bebas hutang.",
+      icon: <Users className="text-sky-400" size={32} />,
+      format: "Telegram Group",
+      link: "https://t.me/lunaskan_circle",
+      buttonLabel: "Gabung Grup"
     }
   ];
 
@@ -58,14 +66,14 @@ export default function BonusPage() {
             <h3 className="text-xl font-bold text-white mb-2">{bonus.title}</h3>
             <p className="text-sm text-gray-400 mb-6 min-h-[40px]">{bonus.description}</p>
             
-            <a 
+            <a
               href={bonus.link}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full bg-white/5 hover:bg-gold hover:text-black text-white transition-all py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
             >
-              <Download size={18} />
-              Unduh Sekarang
+              {bonus.buttonLabel ? <Users size={18} /> : <Download size={18} />}
+              {bonus.buttonLabel ?? "Unduh Sekarang"}
             </a>
           </div>
         ))}
