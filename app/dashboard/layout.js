@@ -155,9 +155,9 @@ export default function DashboardLayout({ children }) {
           <div className="relative z-10">
             <p className="text-[10px] text-gold mb-2 font-black uppercase tracking-widest">✨ Status Member</p>
             <p className="text-xs font-bold leading-relaxed text-gray-400">
-              {profile.is_pro 
-                ? "Saat ini Anda sedang berada di versi PRO. Semua fitur premium terbuka selamanya." 
-                : "Anda menggunakan versi Gratis. Upgrade ke PRO untuk membuka semua fitur."}
+              {profile.is_pro
+                ? "Saat ini Anda sedang berada di versi PRO. Semua fitur premium terbuka selamanya."
+                : "Akses belum aktif. Hubungi admin via WhatsApp untuk aktivasi akun PRO Anda."}
             </p>
           </div>
         </div>
@@ -221,7 +221,7 @@ export default function DashboardLayout({ children }) {
             <div className="flex items-center gap-5 pl-6 border-l border-white/5">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-white">Halo, {profile.display_name}</p>
-                <p className="text-[10px] text-gold font-black uppercase tracking-widest mt-0.5">{profile.is_pro ? "Pro Member" : "Free Account"}</p>
+                <p className="text-[10px] text-gold font-black uppercase tracking-widest mt-0.5">{profile.is_pro ? "Pro Member" : "Belum Aktif"}</p>
               </div>
               <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 p-0.5 hover:scale-105 transition-transform cursor-pointer bg-[#0F1319]">
                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.display_name}`} alt="Avatar" loading="lazy" className="w-full h-full object-cover rounded-[0.5rem]" onError={e => { e.currentTarget.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' fill='%23D4AF37'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18' fill='black'>${(profile.display_name?.[0] || 'U').toUpperCase()}</text></svg>`; }} />

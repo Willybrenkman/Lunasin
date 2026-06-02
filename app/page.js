@@ -218,8 +218,8 @@ function Features() {
   const features = [
     { icon: <TrendingDown size={24} />, title: "Strategi Snowball & Avalanche", desc: "Pilih strategi yang sesuai: Snowball (hutang terkecil dulu) atau Avalanche (bunga tertinggi dulu) untuk hasil optimal." },
     { icon: <BarChart3 size={24} />, title: "Simulasi & Proyeksi Visual", desc: "Lihat grafik visual kapan kamu akan bebas hutang, dan berapa bunga yang bisa dihemat dengan extra payment." },
-    { icon: <MessageSquare size={24} />, title: "Asisten Keuangan", desc: "Tanya strategi, minta estimasi lunas, atau konsultasi soal negosiasi hutang — semua dalam chat real-time." },
-    { icon: <Bell size={24} />, title: "Pengingat Jatuh Tempo", desc: "Tidak pernah lupa bayar lagi. Notifikasi otomatis sebelum tanggal tagihan hutangmu." },
+    { icon: <MessageSquare size={24} />, title: "Asisten Strategi", desc: "Tanya strategi pelunasan, minta estimasi lunas, atau konsultasi soal negosiasi hutang — langsung di dashboard." },
+    { icon: <Bell size={24} />, title: "Pengingat Jatuh Tempo", desc: "Tidak pernah lupa bayar lagi. Pengingat visual jatuh tempo hutang langsung di dashboard-mu." },
     { icon: <ShieldCheck size={24} />, title: "Data Aman & Privasi Terjaga", desc: "Data kamu disimpan aman di server Supabase. Hanya kamu yang bisa mengakses akun dan data hutangmu." },
     { icon: <Zap size={24} />, title: "Catat Pembayaran Real-Time", desc: "Setiap pembayaran otomatis memotong sisa hutang. Tidak perlu hitung manual atau update spreadsheet." },
   ];
@@ -312,7 +312,7 @@ function Pricing() {
                   "Laporan & Analitik Detail",
                   "Simulasi What-If Analysis",
                   "Pengingat jatuh tempo",
-                  "Asisten Keuangan Priority",
+                  "Asisten Strategi Priority",
                   "Update fitur selamanya",
                   "Support prioritas via WhatsApp",
                 ].map((f, i) => (
@@ -439,10 +439,17 @@ function Footer() {
             </ul>
           </div>
         </div>
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-600 font-medium">© 2025 Lunaskan.online. All rights reserved.</p>
-          <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-            <Lock size={12} /> Data kamu aman di server Supabase
+        <div className="pt-8 border-t border-white/5 space-y-4">
+          <p className="text-xs text-gray-600 font-medium text-center leading-relaxed">
+            Lunaskan.online bukan lembaga jasa keuangan dan tidak memberikan nasihat keuangan profesional. Konten bersifat edukasi dan informasi semata.
+          </p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-gray-600 font-medium">© 2026 Lunaskan.online. All rights reserved.</p>
+            <div className="flex items-center gap-4 text-xs text-gray-600 font-medium">
+              <Link href="/privacy-policy" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Syarat & Ketentuan</Link>
+              <div className="flex items-center gap-2"><Lock size={12} /> Data aman di Supabase</div>
+            </div>
           </div>
         </div>
       </div>
