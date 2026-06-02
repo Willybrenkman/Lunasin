@@ -428,7 +428,7 @@ function FinalCTA() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href={WA_DAFTAR} target="_blank" rel="noopener noreferrer">
                 <button className="w-full sm:w-auto bg-gold text-black px-10 py-4 rounded-2xl font-black text-base hover:brightness-110 active:scale-95 transition-all shadow-2xl shadow-gold/30 flex items-center justify-center gap-2">
-                  Daftar via WhatsApp <ChevronRight size={18} />
+                  Daftar Sekarang <ChevronRight size={18} />
                 </button>
               </a>
             </div>
