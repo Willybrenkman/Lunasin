@@ -200,18 +200,13 @@ export default function DemoPage() {
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
               <a
-                href="https://wa.me/6289627314790?text=Halo%20Admin%20Lunaskan.online,%20saya%20tertarik%20membeli%20lisensi%20PRO"
+                href="https://rapidigital.myscalev.com/lunaskan-pro"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gold text-black px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-gold/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
               >
                 <Crown size={18} /> Dapatkan Akses PRO
               </a>
-              <Link href="/login">
-                <button className="bg-white/5 border border-white/10 text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-white/10 transition-all flex items-center gap-2">
-                  Sudah punya kode? <ArrowRight size={16} />
-                </button>
-              </Link>
             </div>
           </div>
         </main>
