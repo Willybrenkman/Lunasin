@@ -429,7 +429,6 @@ function FinalCTA() {
                 </button>
               </a>
             </div>
-            <p className="mt-6 text-xs text-gray-600 font-medium">Butuh bantuan? <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">Chat admin langsung</a></p>
           </div>
         </div>
       </div>
